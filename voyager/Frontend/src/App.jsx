@@ -3,23 +3,21 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 
 
-const fetchData = async () => {
-    try {
-        const resp = await axios.get('https://3.22.81.67/')
-        const data = await JSON.parse(resp);
-
-        return data;
-    } catch(error) {
-        console.error(error);
-    }
+const fetchData = () => {
+    axios.get('http://3.22.81.67:5000/')
+        .then(response => {
+            return response.data
+        })
+        .catch(error => {
+            console.error(error);
+        });
 }
 
 export const App = () => {
     const [data, setData] = useState('');
 
     const testFetch = async () => {
-        const fetchedData = await fetchData();
-
+        const fetchedData = fetchData();
         setData(fetchedData);
     }
 
