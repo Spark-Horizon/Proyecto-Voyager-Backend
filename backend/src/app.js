@@ -5,7 +5,11 @@ const app = express();
 app.use(logger);
 
 app.get('/', (req, res) => {
-  res.json('Esta vivo 😳');
+  const test = {
+    message: 'works!'
+  }
+
+  res.json(test);
 });
 
 app.listen(3000, () => {
