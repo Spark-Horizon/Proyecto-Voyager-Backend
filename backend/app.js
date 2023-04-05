@@ -5,7 +5,7 @@ const app = express();
 app.use(logger);
 
 app.get('/', (req, res) => {
-  res.send('Hola mundo');
+  res.json('Esta vivo 😳');
 });
 
 app.listen(3000, () => {
