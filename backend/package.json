@@ -1,0 +1,14 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "iCode web app backend",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "SparkHorizon",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
