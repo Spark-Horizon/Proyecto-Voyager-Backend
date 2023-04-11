@@ -10,6 +10,7 @@ app.get('/', (req, res) => {
   }
 
   res.json(test);
+  res.send('works');
 });
 
 app.listen(3000, () => {
