@@ -9,7 +9,9 @@
   "author": "SparkHorizon",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "mongodb": "^5.2.0"
+    "mongodb": "^5.2.0",
+    "mongodb-connection-string-url": "^2.6.0"
   }
 }
