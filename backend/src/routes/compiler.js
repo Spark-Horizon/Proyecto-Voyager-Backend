@@ -40,7 +40,13 @@ router.post('/problem/:id_problem/run', async (req, res) => {
     const {compinfo, stdout, stderr} = await submit(suite);
 
     /* Parse compiler output
-        
+        The compiler can throw diferent types of output:
+        - compinfo
+            - Information about the compiler i.e. syntax erros.
+        - stdout
+            - The main output of the test suite.
+        - stderr
+            - Errors occured inside the test suite.
     */
     if (stderr)
         return parseStderr(stderr);
