@@ -1,21 +1,28 @@
+// [IMPORTS]
 const express = require('express');
 const logger = require('./logger');
 const app = express();
-//For MongoDB connection
+
+// [ROUTES IMPORTS]
+
+// [MONGODB] 
+// Establish connection
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = process.env.URI;
 
+// [MIDDLEWARE]
+// Use of a logger
 app.use(logger);
 
+// [ROUTES]
 app.get('/', (req, res) => {
   const test = {
     message: 'works!'
   }
 
   res.json(test);
-  res.send('works');
 });
 
 app.listen(3000, () => {
