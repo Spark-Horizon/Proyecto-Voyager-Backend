@@ -1,6 +1,8 @@
+// [IMPORTS]
 const express = require('express');
 const logger = require('./logger');
 const app = express();
+
 //For RDS (AWS) database service connection
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
@@ -12,6 +14,7 @@ const dbClient = new Client({
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT
 })
+
 // try connection
 dbClient.connect((err) => {
   if (err) {
@@ -21,15 +24,17 @@ dbClient.connect((err) => {
   }
 });
 
+// [MIDDLEWARE]
+// Use of a logger
 app.use(logger);
 
+// [ROUTES]
 app.get('/', (req, res) => {
   const test = {
     message: 'works!'
   }
 
   res.json(test);
-  res.send('works');
 });
 
 app.listen(3000, () => {
