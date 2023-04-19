@@ -1,12 +1,16 @@
-// app.js
+// [IMPORTS]
 const express = require('express');
-const logger = require('./logger');
+const logger = require('./middleware/logger');
 const app = express();
 
-//For RDS (AWS) database service connection
+// [DATA BASE CONNECTION]
+// For RDS (AWS) database service connection
 const path = require('path');
+
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+
 const { Client } = require('pg');
+
 const dbClient = new Client({
   user: process.env.PGUSER,
   host: process.env.PGHOST,
@@ -14,7 +18,8 @@ const dbClient = new Client({
   password: process.env.PGPASSWORD,
   port: process.env.PGPORT
 })
-// try connection
+
+// Try connection
 dbClient.connect((err) => {
   if (err) {
     console.error("Error de conexión:", err.stack);
@@ -23,8 +28,11 @@ dbClient.connect((err) => {
   }
 });
 
+// [MIDDLEWARE]
+// Use of a logger
 app.use(logger);
 
+// [ROUTES]
 app.get('/', (req, res) => {
   const test = {
     message: 'works!'
