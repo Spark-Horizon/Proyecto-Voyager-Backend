@@ -7,7 +7,7 @@ chai.use(chaiHttp);
 
 // Prueba unitaria
 describe('Unit test: logger.js', () => {
-  const logger = require('../src/logger');
+  const logger = require('../src/middleware/logger');
 
   it('should be a middleware function', () => {
     expect(logger).to.be.a('function');
