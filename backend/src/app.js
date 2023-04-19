@@ -1,6 +1,8 @@
+// app.js
 const express = require('express');
 const logger = require('./logger');
 const app = express();
+
 //For RDS (AWS) database service connection
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
@@ -29,9 +31,15 @@ app.get('/', (req, res) => {
   }
 
   res.json(test);
-  res.send('works');
 });
 
-app.listen(3000, () => {
-  console.log('Servidor iniciado en el puerto 3000');
-});
+// Inicia el servidor solo si este archivo es el punto de entrada principal
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Servidor iniciado en el puerto ${PORT}`);
+  });
+}
+
+module.exports = app;
+
