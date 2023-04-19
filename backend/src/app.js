@@ -3,6 +3,8 @@ const express = require('express');
 const logger = require('./middleware/logger');
 const app = express();
 
+
+// [DATA BASE CONNECTION]
 // For RDS (AWS) database service connection
 const path = require('path');
 
@@ -33,11 +35,7 @@ app.use(logger);
 
 // [ROUTES]
 app.get('/', (req, res) => {
-  const test = {
-    message: 'works!'
-  }
-
-  res.json(test);
+  res.send('Server working!');
 });
 
 app.listen(3000, () => {
