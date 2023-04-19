@@ -3,7 +3,6 @@ const express = require('express');
 const logger = require('./middleware/logger');
 const app = express();
 
-
 // [DATA BASE CONNECTION]
 // For RDS (AWS) database service connection
 const path = require('path');
@@ -35,9 +34,20 @@ app.use(logger);
 
 // [ROUTES]
 app.get('/', (req, res) => {
-  res.send('Server working!');
+  const test = {
+    message: 'works!'
+  }
+
+  res.json(test);
 });
 
-app.listen(3000, () => {
-  console.log('Servidor iniciado en el puerto 3000');
-});
+// Inicia el servidor solo si este archivo es el punto de entrada principal
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Servidor iniciado en el puerto ${PORT}`);
+  });
+}
+
+module.exports = app;
+

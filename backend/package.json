@@ -4,7 +4,7 @@
   "description": "iCode web app backend",
   "main": "app.js",
   "scripts": {
-    "test": "test"
+    "test": "mocha --recursive --exit"
   },
   "author": "SparkHorizon",
   "license": "MIT",
@@ -14,5 +14,11 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "pg": "^8.10.0"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "chai-http": "^4.3.0",
+    "mocha": "^10.2.0",
+    "supertest": "^6.3.3"
   }
 }
