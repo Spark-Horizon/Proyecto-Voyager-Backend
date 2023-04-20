@@ -1,7 +1,5 @@
 const express = require('express');
 
-const { parseStderr } = require('./parseTestErrors');
-
 const submit = async (suite) => {
     try {
         let data = JSON.stringify({

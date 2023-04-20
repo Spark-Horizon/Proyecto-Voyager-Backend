@@ -7,7 +7,7 @@ const { parseStderr } = require('../helpers/jobe/parseTestErrors');
 const router = express.Router();
 
 
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
     res.send('compiler route working')
 })
 
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
     the client with that data. It also saves data in the cache in order
     to reduce the amount of querys.
 */
-router.get('/problem/:id_problem', async (req, res) => {
+router.get('/problem/:id_problem', (req, res) => {
     const id_problem = req.params.id_problem;
 
     /* Database query - replace 0 with data retrieved from the query

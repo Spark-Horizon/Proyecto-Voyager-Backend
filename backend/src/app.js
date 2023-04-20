@@ -2,6 +2,9 @@
 const express = require('express');
 const logger = require('./middleware/logger');
 const app = express();
+const cors = require('cors');
+
+app.use(cors);
 
 // [ROUTES IMPORTS]
 const compilerRouter = require('./routes/compiler');
