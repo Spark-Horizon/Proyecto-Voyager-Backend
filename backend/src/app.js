@@ -36,11 +36,11 @@ dbClient.connect((err) => {
 app.use(logger);
 
 // [ROUTES]
-app.use('/compiler', compilerRouter);
-
 app.get('/', (req, res) => {
   res.send('Hello world :)');
 });
+
+app.use('/compiler', compilerRouter);
 
 // Inicia el servidor solo si este archivo es el punto de entrada principal
 if (require.main === module) {
