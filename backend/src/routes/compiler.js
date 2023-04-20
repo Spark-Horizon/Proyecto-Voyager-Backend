@@ -1,8 +1,8 @@
 const express = require('express');
-const NodeCache = require('node-cache');
 
 const { submit } = require('../helpers/jobe/submit');
 const { createTestSuite } = require('../helpers/jobe/testSuiteCreation');
+const { parseStderr } = require('../helpers/jobe/parseTestErrors');
 
 const router = express.Router();
 
@@ -48,15 +48,21 @@ router.post('/problem/:id_problem/run', async (req, res) => {
         - stderr
             - Errors occured inside the test suite.
     */
-    if (stderr)
-        return parseStderr(stderr);
+    if (stderr) {
+        const parsedError = parseStderr(stderr);
 
-    if (compinfo)
-        return compinfo;
-    
-    // Save submission data to database
-
-    return res.send(stdout)
+        res.send({
+            stderr: parsedError
+        })
+    } else if (compinfo) {
+        res.send({
+            compinfo
+        });
+    } else {
+        res.send({
+            stdout
+        })
+    }
 })
 
 
