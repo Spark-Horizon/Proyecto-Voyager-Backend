@@ -1,10 +1,11 @@
 const axios = require('axios');
 
-const { createTestSuite } = require('../helpers/jobe/testSuiteCreation');
-const { parseStderr } = require('../helpers/jobe/parseTestErrors');
+const { createTestSuite } = require('./testSuiteCreation');
+const { parseStderr } = require('./parseTestErrors');
 
 const code = 'def mock(a, b, c):\n\treturn a + b + c';
 const stackOverflow = 'def infinite_recursion(a, b, c): infinite_recursion(a, b, c)';
+const drivers = ['mock', 'infinite']
 const tests = [
     {
         "input": "1, 2, 3",

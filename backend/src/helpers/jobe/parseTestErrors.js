@@ -1,10 +1,11 @@
 const parseStderr = (errString) => {
+    console.log(errString)
     let errorData = [];
 
     const testPattern = /\b(FAIL:).+/g;
     const failedTests = errString.match(testPattern);
 
-    const errPattern = /----------------------------------------------------------------------\nTraceback(.+\s)+\n/g;
+    const errPattern = /Traceback(.+\s)+\n/g;
     const assertionErrors = errString.match(errPattern);
 
     failedTests.forEach(ft => {
