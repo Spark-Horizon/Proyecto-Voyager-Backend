@@ -3,6 +3,9 @@ const express = require('express');
 const logger = require('./middleware/logger');
 const app = express();
 
+// [ROUTES IMPORTS]
+const compilerRouter = require('./routes/compiler');
+
 // [DATA BASE CONNECTION]
 // For RDS (AWS) database service connection
 const path = require('path');
@@ -33,12 +36,10 @@ dbClient.connect((err) => {
 app.use(logger);
 
 // [ROUTES]
-app.get('/', (req, res) => {
-  const test = {
-    message: 'works!'
-  }
+app.use('/compiler', compilerRouter);
 
-  res.json(test);
+app.get('/', (req, res) => {
+  res.send('Hello world :)');
 });
 
 // Inicia el servidor solo si este archivo es el punto de entrada principal
