@@ -52,7 +52,7 @@ router.post('/problem/:id_problem/run', async (req, res) => {
         const parsedError = parseStderr(stderr);
 
         res.send({
-            stderr: parsedError
+            parsedError
         })
     } else if (compinfo) {
         res.send({
