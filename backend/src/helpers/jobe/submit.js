@@ -2,7 +2,7 @@ const express = require('express');
 
 const { parseStderr } = require('./parseTestErrors');
 
-export const submit = async (suite) => {
+const submit = async (suite) => {
     try {
         let data = JSON.stringify({
             "run_spec": {
@@ -36,3 +36,5 @@ export const submit = async (suite) => {
         return JSON.stringify(error);
     }
 }
+
+exports.submit = submit;
