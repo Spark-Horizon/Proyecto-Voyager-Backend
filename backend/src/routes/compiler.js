@@ -7,6 +7,10 @@ const { parseStderr } = require('../helpers/jobe/parseTestErrors');
 const router = express.Router();
 
 
+router.get('/', async (req, res) => {
+    res.send('compiler route working')
+})
+
 /* PROBLEM endpoint
     Retrieves information about an specific problem and responds to 
     the client with that data. It also saves data in the cache in order
