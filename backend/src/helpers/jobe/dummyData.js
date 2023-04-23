@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const { createTestSuite } = require('./testSuiteCreation');
+const { createTestSuite } = require('./test_suite/testSuiteCreation');
 const { parseStderr } = require('./parseTestErrors');
 
 const code = 'def mock(a, b, c):\n\treturn a + b + c';
