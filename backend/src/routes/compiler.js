@@ -1,5 +1,7 @@
 const express = require('express');
 
+const PythonTestSuite = require('../helpers/jobe/test_suite/TestSuite');
+
 const { submit } = require('../helpers/jobe/submit');
 const { createTestSuite } = require('../helpers/jobe/testSuiteCreation');
 const { parseStderr } = require('../helpers/jobe/parseTestErrors');
@@ -40,8 +42,15 @@ router.post('/problem/:id_problem/run', async (req, res) => {
     if (code == '')
         return res.send('No code to execute!')
 
-    const suite = createTestSuite(code, driver, tests);
-    const {compinfo, stdout, stderr} = await submit(suite);
+    const suite = new PythonTestSuite(tests, driver);
+
+    suite.defineSourceCode(code);
+    suite.defineAssertions();
+
+    const data = await submit(suite.getSourceCode());
+    const { compinfo, stdout, stderr } = data;
+
+    suite = null;
 
     /* Parse compiler output
         The compiler can throw diferent types of output:
@@ -52,13 +61,13 @@ router.post('/problem/:id_problem/run', async (req, res) => {
         - stderr
             - Errors occured inside the test suite.
     */
-    if (stderr) {
+    if (stderr != "") {
         const parsedError = parseStderr(stderr);
 
         res.send({
             parsedError
         })
-    } else if (compinfo) {
+    } else if (compinfo != "") {
         res.send({
             compinfo
         });
@@ -67,6 +76,8 @@ router.post('/problem/:id_problem/run', async (req, res) => {
             stdout
         })
     }
+
+    console.log('done');
 })
 
 
