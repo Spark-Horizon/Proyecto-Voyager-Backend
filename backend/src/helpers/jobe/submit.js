@@ -1,19 +1,15 @@
-const express = require('express');
+/* SUBMIT FUNCTION
+    This function submits a post petition to the backend
+    so the code can be compiled and parsed.
 
-const submit = async (suite) => {
+    This petition returns only data in order to make this function
+    more customizable.
+*/
+const submit = async (url, method, data) => {
     try {
-        let data = JSON.stringify({
-            "run_spec": {
-                maxBodyLength: Infinity,
-                "language_id": "python3",
-                "sourcecode": suite,
-                "input": ""
-            }
-        });
-
         const options = {
-            method: 'post',
-            url: 'http://3.15.39.127/jobe/index.php/restapi/runs/',
+            method: method,
+            url: url,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -22,14 +18,9 @@ const submit = async (suite) => {
 
         const response = await axios(options);
 
-        const { data: { compinfo, stdout, stderr} } = response;
+        const { data } = response;
 
-
-        return {
-            compinfo,
-            stdout,
-            stderr
-        };
+        return data;
     } catch(error) {
         return JSON.stringify(error);
     }
