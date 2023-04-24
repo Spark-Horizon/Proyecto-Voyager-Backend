@@ -23,7 +23,7 @@ class PythonTestSuite {
         if (this._driver == '') {
             this._tests.forEach(test => {
                 let { output } = test;
-        
+                
                 this._outputs.push(output);
             });
 

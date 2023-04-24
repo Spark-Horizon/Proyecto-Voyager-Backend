@@ -35,24 +35,30 @@ router.get('/problem/:id_problem', (req, res) => {
     code output or errors, it doesn't save the code data on the
     database.
 */
-router.post('/problem/:id_problem/run', async (req, res) => {
+router.post('/problem/run', async (req, res) => {
     const body = req.body;
     const { code, driver, tests } = body;
 
     if (code == '')
-        return res.send('No code to execute!')
+        res.send({
+            compinfo: 'No hay código por ejecutar.',
+            stdout: null,
+            stderr: null
+        })
 
+    // Test suite creation
     const suite = new PythonTestSuite(tests, driver);
 
     suite.defineSourceCode(code);
     suite.defineAssertions();
 
+    // Retrieve data from JOBE
     const data = await submit(suite.getSourceCode());
     const { compinfo, stdout, stderr } = data;
 
     suite = null;
 
-    /* Parse compiler output
+    /* Compiler output
         The compiler can throw diferent types of output:
         - compinfo
             - Information about the compiler i.e. syntax erros.
@@ -61,23 +67,11 @@ router.post('/problem/:id_problem/run', async (req, res) => {
         - stderr
             - Errors occured inside the test suite.
     */
-    if (stderr != "") {
-        const parsedError = parseStderr(stderr);
-
-        res.send({
-            parsedError
-        })
-    } else if (compinfo != "") {
-        res.send({
-            compinfo
-        });
-    } else {
-        res.send({
-            stdout
-        })
-    }
-
-    console.log('done');
+    res.send({
+        compinfo,
+        stdout,
+        stderr
+    })
 })
 
 
