@@ -53,10 +53,14 @@ router.post('/problem/run', async (req, res) => {
     suite.defineAssertions();
 
     // Retrieve data from JOBE
-    const data = await submit(suite.getSourceCode());
-    const { compinfo, stdout, stderr } = data;
+    const testData = await submit(suite.getSourceCode());
+    const { compinfo, stdout:stdoutTests, stderr } = testData;
 
     suite = null;
+    
+    const normalData = await submit(code);
+    const { stdout } = normalData;
+
 
     /* Compiler output
         The compiler can throw diferent types of output:
@@ -69,6 +73,7 @@ router.post('/problem/run', async (req, res) => {
     */
     res.send({
         compinfo,
+        stdoutTests,
         stdout,
         stderr
     })
