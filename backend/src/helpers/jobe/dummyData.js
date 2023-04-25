@@ -10,15 +10,7 @@ const tests = [
     {
         "input": "1, 2, 3",
         "output": "6"
-    },
-    {
-        "input": "2, 2, 3",
-        "output": "10"
-    },
-    {
-        "input": "2, 2, 3",
-        "output": "10"
-    },
+    }
 ];
 
 
