@@ -3,7 +3,6 @@ const express = require('express');
 const PythonTestSuite = require('../helpers/jobe/test_suite/TestSuite');
 
 const { submit } = require('../helpers/jobe/submit');
-const { createTestSuite } = require('../helpers/jobe/testSuiteCreation');
 const { parseStderr } = require('../helpers/jobe/parseTestErrors');
 
 const router = express.Router();
@@ -57,7 +56,7 @@ router.post('/problem/run', async (req, res) => {
     const { compinfo, stdout:stdoutTests, stderr } = testData;
 
     suite = null;
-    
+
     const normalData = await submit(code);
     const { stdout } = normalData;
 
