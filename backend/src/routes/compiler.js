@@ -35,9 +35,8 @@ router.get('/problem/:id_problem', (req, res) => {
     database.
 */
 router.post('/problem/run', async (req, res) => {
-    const body = req.body;
-    const { code, driver, tests } = body;
-
+    const { code, driver, tests } = req.body;
+    
     if (code == '')
         res.send({
             compinfo: 'No hay código por ejecutar.',

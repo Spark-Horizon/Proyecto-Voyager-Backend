@@ -4,7 +4,12 @@ const logger = require('./middleware/logger');
 const app = express();
 const cors = require('cors');
 
-app.use(cors());
+//[CORS Configuration]
+//TODO: Añadir IP del Front End desplegado sino no conectara
+var corsOptions = {
+  origin: ["http://localhost:3000", "http://localhost", "http://localhost:3001"]
+};
+app.use(cors(corsOptions));
 
 // [ROUTES IMPORTS]
 const compilerRouter = require('./routes/compiler');
@@ -37,6 +42,8 @@ dbClient.connect((err) => {
 // [MIDDLEWARE]
 // Use of a logger
 app.use(logger);
+
+app.use(express.json())
 
 // [ROUTES]
 app.get('/', (req, res) => {
