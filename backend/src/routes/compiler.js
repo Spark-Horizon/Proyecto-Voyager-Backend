@@ -49,12 +49,12 @@ router.post('/problem/run', async (req, res) => {
         console.log('suite', suite.getDataObject)
         const testData = await submit('http://localhost/jobe/index.php/restapi/runs/', 'post', suite.getDataObject);
         console.log('testData', testData)
-        const { compinfo, stdout:stdoutTests, stderr } = testData;
+        const { cmpinfo, stdout, stderr } = testData;
         console.log('q pedo')
         suite = null;
 
-        console.log('sending', compinfo)
-        console.log('sending', stdoutTests)
+        console.log('sending', cmpinfo)
+        console.log('sending', stdout)
         console.log('sending', stderr)
         /* Compiler output
             The compiler can throw diferent types of output:
@@ -66,8 +66,7 @@ router.post('/problem/run', async (req, res) => {
                 - Errors occured inside the test suite.
         */
         res.send({
-            compinfo,
-            stdoutTests,
+            cmpinfo,
             stdout,
             stderr
         })
