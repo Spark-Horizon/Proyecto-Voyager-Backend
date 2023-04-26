@@ -16,7 +16,9 @@ const submit = async (url, method, submitData) => {
             data: submitData
         };          
 
+        console.log('options', options)
         const response = await axios(options);
+        console.log('response', response)
 
         const { data } = response;
         console.log('data', data)
