@@ -28,7 +28,7 @@ class PythonTestSuite {
             });
 
             for (let i = 0; i < this._tests.length; i++)
-                assertions += `    def test_case_${i}(self):\n        self.assertEqual(main_driver(), ${this._outputs[i]})\n\n`;
+                assertions += `    def test_case_${i}(self):\n\tself.assertEqual(main_driver(), ${this._outputs[i]})\n\n`;
         
             this._sourceCode['assertions'] = assertions;
         } else {
@@ -40,7 +40,7 @@ class PythonTestSuite {
             })
 
             for (let i = 0; i < this._tests.length; i++)
-                assertions += `    def test_case_${i}(self):\n        self.assertEqual(${this._driver}(${this._inputs}), ${this._outputs[i]})\n\n    `;
+                assertions += `    def test_case_${i}(self):\n\tself.assertEqual(${this._driver}(${this._inputs}), ${this._outputs[i]})\n\n    `;
             
             this._sourceCode['assertions'] = assertions;
         }
