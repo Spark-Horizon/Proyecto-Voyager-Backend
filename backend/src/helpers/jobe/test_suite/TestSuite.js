@@ -3,7 +3,7 @@ class PythonTestSuite {
         this._sourceCode = {
             imports: 'import unittest\nimport sys\n',
             code: null,
-            classDefinition: 'class TestMyFunctions(unittest.TestCase):\n',
+            classDefinition: '\nclass TestMyFunctions(unittest.TestCase):\n',
             assertions: null,
             main: "if __name__ == '__main__':\n    loader = unittest.TestLoader()\n    suite = loader.loadTestsFromModule(sys.modules[__name__])\n    runner = unittest.TextTestRunner(verbosity=2)\n    result = runner.run(suite)"
         }
