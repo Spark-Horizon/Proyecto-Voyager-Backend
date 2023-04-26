@@ -46,11 +46,18 @@ class PythonTestSuite {
         }
     }
 
-    get getSourceCode() {
+    get getDataObject() {
         if (this._sourceCode['code'] != null && this._sourceCode['assertions'] != null) {
             const testSuite = Object.values(this._sourceCode).reduce((acc, it) => acc + it, '');
-
-            return testSuite;
+            const finalData = JSON.stringify({
+                "run_spec": {
+                    maxBodyLength: Infinity,
+                    language_id: 'python3',
+                    source_code: testSuite,
+                }
+            })
+            
+            return finalData
         } else {
             return new Error('No code or assertions defined');
         }
