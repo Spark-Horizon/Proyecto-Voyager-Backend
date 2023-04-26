@@ -47,13 +47,13 @@ router.post('/problem/run', async (req, res) => {
     
         // Retrieve data from JOBE
         console.log('suite', suite.getDataObject)
-        const testData = await submit('http://3.15.39.127/jobe/index.php/restapi/runs/', 'post', suite.getDataObject);
+        const testData = await submit('http://localhost/jobe/index.php/restapi/runs/', 'post', suite.getDataObject);
         console.log('testData', testData)
         const { compinfo, stdout:stdoutTests, stderr } = testData;
         
         suite = null;
     
-        const normalData = await submit('http://3.15.39.127/jobe/index.php/restapi/runs/', 'post', suite.getDataObject);
+        const normalData = await submit('http://localhost/jobe/index.php/restapi/runs/', 'post', suite.getDataObject);
         console.log(normalData)
         const { stdout } = normalData;
 
