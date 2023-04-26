@@ -57,6 +57,13 @@ router.post('/problem/run', async (req, res) => {
         console.log(normalData)
         const { stdout } = normalData;
 
+
+        console.log('sending', {
+            compinfo,
+            stdoutTests,
+            stdout,
+            stderr
+        })
         /* Compiler output
             The compiler can throw diferent types of output:
             - compinfo
