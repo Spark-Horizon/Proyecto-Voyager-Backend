@@ -52,7 +52,7 @@ app.use('/compiler', compilerRouter);
 // Inicia el servidor solo si este archivo es el punto de entrada principal
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Servidor iniciado en el puerto ${PORT}`);
   });
 }
