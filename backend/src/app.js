@@ -7,7 +7,7 @@ const cors = require('cors');
 //[CORS Configuration]
 //TODO: Añadir IP del Front End desplegado sino no conectara
 var corsOptions = {
-  origin: ["http://localhost:3000", "http://localhost", "http://localhost:3001", "http://148.241.227.10", "http://148.241.227.10:3000"]
+  origin: '*'
 };
 app.use(cors(corsOptions));
 
