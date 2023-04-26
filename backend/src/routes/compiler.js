@@ -35,47 +35,51 @@ router.get('/problem/:id_problem', (req, res) => {
     database.
 */
 router.post('/problem/run', async (req, res) => {
-    console.log(req.body)
-    const { code, driver, tests } = req.body;
+    try {
+        const { code, driver, tests } = req.body;
+        console.log(req.body)
+        
+        if (code == '')
+            res.send({
+                compinfo: 'No hay código por ejecutar.',
+                stdout: null,
+                stderr: null
+            })
     
-    if (code == '')
+        // Test suite creation
+        let suite = new PythonTestSuite(tests, driver);
+    
+        suite.defineSourceCode(code);
+        suite.defineAssertions();
+    
+        // Retrieve data from JOBE
+        const testData = await submit(suite.getSourceCode);
+        const { compinfo, stdout:stdoutTests, stderr } = testData;
+    
+        suite = null;
+    
+        const normalData = await submit(code);
+        const { stdout } = normalData;
+    
+    
+        /* Compiler output
+            The compiler can throw diferent types of output:
+            - compinfo
+                - Information about the compiler i.e. syntax erros.
+            - stdout
+                - The main output of the test suite.
+            - stderr
+                - Errors occured inside the test suite.
+        */
         res.send({
-            compinfo: 'No hay código por ejecutar.',
-            stdout: null,
-            stderr: null
+            compinfo,
+            stdoutTests,
+            stdout,
+            stderr
         })
-
-    // Test suite creation
-    let suite = new PythonTestSuite(tests, driver);
-
-    suite.defineSourceCode(code);
-    suite.defineAssertions();
-
-    // Retrieve data from JOBE
-    const testData = await submit(suite.getSourceCode);
-    const { compinfo, stdout:stdoutTests, stderr } = testData;
-
-    suite = null;
-
-    const normalData = await submit(code);
-    const { stdout } = normalData;
-
-
-    /* Compiler output
-        The compiler can throw diferent types of output:
-        - compinfo
-            - Information about the compiler i.e. syntax erros.
-        - stdout
-            - The main output of the test suite.
-        - stderr
-            - Errors occured inside the test suite.
-    */
-    res.send({
-        compinfo,
-        stdoutTests,
-        stdout,
-        stderr
-    })
+    } catch(error) {
+        res.send(JSON.stringify(error));
+    }
 })
 
 
