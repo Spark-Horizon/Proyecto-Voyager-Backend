@@ -53,12 +53,9 @@ router.post('/problem/run', async (req, res) => {
         console.log('q pedo')
         suite = null;
 
-        console.log('sending', {
-            compinfo,
-            stdoutTests,
-            stdout,
-            stderr
-        })
+        console.log('sending', compinfo)
+        console.log('sending', stdoutTests)
+        console.log('sending', stderr)
         /* Compiler output
             The compiler can throw diferent types of output:
             - compinfo
