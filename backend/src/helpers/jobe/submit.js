@@ -26,7 +26,7 @@ const submit = async (url, method, submitData) => {
 
         return data;
     } catch(error) {
-        return JSON.stringify(error);
+        console.log(error)
     }
 }
 
