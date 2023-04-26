@@ -1,3 +1,5 @@
+const axios = require('axios')
+
 /* SUBMIT FUNCTION
     This function submits a post petition to the backend
     so the code can be compiled and parsed.
