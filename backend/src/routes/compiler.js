@@ -35,6 +35,7 @@ router.get('/problem/:id_problem', (req, res) => {
     database.
 */
 router.post('/problem/run', async (req, res) => {
+    console.log(req.body)
     const { code, driver, tests } = req.body;
     
     if (code == '')
@@ -45,13 +46,13 @@ router.post('/problem/run', async (req, res) => {
         })
 
     // Test suite creation
-    const suite = new PythonTestSuite(tests, driver);
+    let suite = new PythonTestSuite(tests, driver);
 
     suite.defineSourceCode(code);
     suite.defineAssertions();
 
     // Retrieve data from JOBE
-    const testData = await submit(suite.getSourceCode());
+    const testData = await submit(suite.getSourceCode);
     const { compinfo, stdout:stdoutTests, stderr } = testData;
 
     suite = null;
