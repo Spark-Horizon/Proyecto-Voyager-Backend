@@ -5,7 +5,7 @@
     This petition returns only data in order to make this function
     more customizable.
 */
-const submit = async (url, method, data) => {
+const submit = async (url, method, submitData) => {
     try {
         const options = {
             method: method,
@@ -13,7 +13,7 @@ const submit = async (url, method, data) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            data: data
+            data: submitData
         };          
 
         const response = await axios(options);
