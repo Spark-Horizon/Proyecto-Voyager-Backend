@@ -52,11 +52,6 @@ router.post('/problem/run', async (req, res) => {
         const { compinfo, stdout:stdoutTests, stderr } = testData;
         
         suite = null;
-    
-        const normalData = await submit('http://localhost/jobe/index.php/restapi/runs/', 'post', suite.getDataObject);
-        console.log(normalData)
-        const { stdout } = normalData;
-
 
         console.log('sending', {
             compinfo,
