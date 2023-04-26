@@ -19,6 +19,8 @@ const submit = async (url, method, data) => {
         const response = await axios(options);
 
         const { data } = response;
+        console.log('data', data)
+
 
         return data;
     } catch(error) {
