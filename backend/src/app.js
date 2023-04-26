@@ -6,10 +6,7 @@ const cors = require('cors');
 
 //[CORS Configuration]
 //TODO: Añadir IP del Front End desplegado sino no conectara
-var corsOptions = {
-  origin: '*'
-};
-app.use(cors(corsOptions));
+app.use(cors());
 
 // [ROUTES IMPORTS]
 const compilerRouter = require('./routes/compiler');
