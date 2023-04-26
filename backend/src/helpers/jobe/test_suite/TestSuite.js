@@ -49,13 +49,13 @@ class PythonTestSuite {
     get getDataObject() {
         if (this._sourceCode['code'] != null && this._sourceCode['assertions'] != null) {
             const testSuite = Object.values(this._sourceCode).reduce((acc, it) => acc + it, '');
-            const finalData = JSON.stringify({
+            const finalData = {
                 run_spec: {
                     maxBodyLength: Infinity,
                     language_id: 'python3',
                     sourcecode: testSuite,
                 }
-            })
+            }
 
             return finalData
         } else {
