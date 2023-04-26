@@ -50,7 +50,7 @@ router.post('/problem/run', async (req, res) => {
         const testData = await submit('http://localhost/jobe/index.php/restapi/runs/', 'post', suite.getDataObject);
         console.log('testData', testData)
         const { compinfo, stdout:stdoutTests, stderr } = testData;
-        
+        console.log('q pedo')
         suite = null;
 
         console.log('sending', {
