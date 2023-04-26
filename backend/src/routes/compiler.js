@@ -46,13 +46,14 @@ router.post('/problem/run', async (req, res) => {
         suite.defineAssertions();
     
         // Retrieve data from JOBE
-        const testData = await submit(suite.getSourceCode);
+        console.log(suite.getSourceCodex)
+        const testData = await submit('http://3.15.39.127/jobe/index.php/restapi/runs/', 'post', suite.getSourceCode);
         console.log(testData)
         const { compinfo, stdout:stdoutTests, stderr } = testData;
         
         suite = null;
     
-        const normalData = await submit(code);
+        const normalData = await submit('http://3.15.39.127/jobe/index.php/restapi/runs/', 'post', suite.getSourceCode);
         console.log(normalData)
         const { stdout } = normalData;
 
