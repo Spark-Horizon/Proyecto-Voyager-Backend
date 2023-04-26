@@ -38,13 +38,6 @@ router.post('/problem/run', async (req, res) => {
     try {
         const { code, driver, tests } = req.body;
         console.log(req.body)
-        
-        if (code == '')
-            res.send({
-                compinfo: 'No hay código por ejecutar.',
-                stdout: null,
-                stderr: null
-            })
     
         // Test suite creation
         let suite = new PythonTestSuite(tests, driver);
@@ -54,14 +47,15 @@ router.post('/problem/run', async (req, res) => {
     
         // Retrieve data from JOBE
         const testData = await submit(suite.getSourceCode);
+        console.log(testData)
         const { compinfo, stdout:stdoutTests, stderr } = testData;
-    
+        
         suite = null;
     
         const normalData = await submit(code);
+        console.log(normalData)
         const { stdout } = normalData;
-    
-    
+
         /* Compiler output
             The compiler can throw diferent types of output:
             - compinfo
