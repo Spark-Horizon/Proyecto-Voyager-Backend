@@ -53,10 +53,10 @@ class PythonTestSuite {
                 "run_spec": {
                     maxBodyLength: Infinity,
                     language_id: 'python3',
-                    source_code: testSuite,
+                    sourcecode: testSuite,
                 }
             })
-            
+
             return finalData
         } else {
             return new Error('No code or assertions defined');
