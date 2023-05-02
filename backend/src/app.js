@@ -5,6 +5,7 @@ const cors = require('cors');
 const logger = require('./middleware/logger');
 const pool = require('../db/index');
 const compilerRouter = require('./routes/compiler');
+const crudRouter = require('./routes/crud');
 
 //[Express Initialization]
 const app = express();
@@ -34,6 +35,7 @@ app.use(logger)
 
 //[Routing Initialization]
 app.use('/compiler', compilerRouter);
+app.use('/crud', crudRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello world :)');
