@@ -1,9 +1,9 @@
 const express = require('express');
 
-const PythonTestSuite = require('../helpers/jobe/test_suite/TestSuite');
 
 const { submit } = require('../helpers/jobe/submit');
 const { parseStderr } = require('../helpers/jobe/parseTestErrors');
+const { PythonPromiseFactory } = require('../helpers/jobe/test_suite/PythonPromise');
 
 const router = express.Router();
 
@@ -35,44 +35,52 @@ router.get('/problem/:id_problem', (req, res) => {
     database.
 */
 router.post('/problem/run', async (req, res) => {
-    try {
-        const { code, driver, tests } = req.body;
-        console.log(req.body)
-    
-        // Test suite creation
-        let suite = new PythonTestSuite(tests, driver);
-    
-        suite.defineSourceCode(code);
-        suite.defineAssertions();
-    
-        // Retrieve data from JOBE
-        console.log('suite', suite.getDataObject)
-        const testData = await submit('http://localhost/jobe/index.php/restapi/runs/', 'post', suite.getDataObject);
-        console.log('testData', testData)
-        const { cmpinfo, stdout, stderr } = testData;
-        console.log('q pedo')
-        suite = null;
+    console.log(req.body);
+    const { code, driver, tests } = req.body;
 
-        console.log('sending', cmpinfo)
-        console.log('sending', stdout)
-        console.log('sending', stderr)
-        /* Compiler output
-            The compiler can throw diferent types of output:
-            - compinfo
-                - Information about the compiler i.e. syntax erros.
-            - stdout
-                - The main output of the test suite.
-            - stderr
-                - Errors occured inside the test suite.
-        */
-        res.send({
-            cmpinfo,
-            stdout,
-            stderr
-        })
-    } catch(error) {
-        res.send(JSON.stringify(error));
+    if (!req.body || Object.keys(req.body).length === 0) { 
+        return res.status(400).send('Body data is undefined');
+    }      
+
+    let promiseFactory = new PythonPromiseFactory()
+    let pythonPromise;
+
+    // Defining which type of promise will be resolved
+    if (driver !== '') {
+        pythonPromise = promiseFactory.createPromise('driver', tests, driver, 'http://18.218.84.144/jobe/index.php/restapi/runs/', 'POST', code)
+        pythonPromise.defineAssertions();
+
+        try {
+            const response = await pythonPromise.getPromise;
+            const { cmpinfo, stdout, stderr } = response;
+
+            console.log(response)
+        } catch (error) {
+            console.log(error);
+        }
+    } else {
+        pythonPromise = promiseFactory.createPromise('noDriver', tests, driver, 'http://18.218.84.144/jobe/index.php/restapi/runs/', 'POST', code)
+        pythonPromise.defineInputs();
+        try {
+            const responses = await Promise.all(pythonPromise.getPromiseArray);
+            for (const response of responses) {
+                let {cmpinfo, stdout, stderr} = response;
+                console.log({cmpinfo, stdout, stderr});
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
+
+    /* Compiler output
+        The compiler can throw diferent types of output:
+        - compinfo
+            - Information about the compiler i.e. syntax erros.
+        - stdout
+            - The main output of the test suite.
+        - stderr
+            - Errors occured inside the test suite.
+    */
 })
 
 
