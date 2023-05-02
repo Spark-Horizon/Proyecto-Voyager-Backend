@@ -2,10 +2,11 @@ const express = require('express');
 
 
 const { submit } = require('../helpers/jobe/submit');
-const { parseStderr } = require('../helpers/jobe/parseTestErrors');
 const { PythonPromiseFactory } = require('../helpers/jobe/test_suite/PythonPromise');
 
 const router = express.Router();
+
+const IP_SERVER = process.env.IP;
 
 
 router.get('/', (req, res) => {
@@ -47,19 +48,24 @@ router.post('/problem/run', async (req, res) => {
 
     // Defining which type of promise will be resolved
     if (driver !== '') {
-        pythonPromise = promiseFactory.createPromise('driver', tests, driver, 'http://18.218.84.144/jobe/index.php/restapi/runs/', 'POST', code)
+        pythonPromise = promiseFactory.createPromise('driver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
         pythonPromise.defineAssertions();
 
         try {
+            /* PYTHON CODE WITH DRIVER
+                When driver's name is given, a test suite will be generated. This test suite uses the standard error output so the code can be easily pruned.
+            */ 
             const response = await pythonPromise.getPromise;
             const { cmpinfo, stdout, stderr } = response;
+
+            // TO-DO: Parse stderr to return 
 
             console.log(response)
         } catch (error) {
             console.log(error);
         }
     } else {
-        pythonPromise = promiseFactory.createPromise('noDriver', tests, driver, 'http://18.218.84.144/jobe/index.php/restapi/runs/', 'POST', code)
+        pythonPromise = promiseFactory.createPromise('noDriver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
         pythonPromise.defineInputs();
         try {
             const responses = await Promise.all(pythonPromise.getPromiseArray);
