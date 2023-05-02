@@ -13,7 +13,7 @@ const app = express();
 //[CORS Configuration]
 //TODO: Añadir IP del Front End desplegado sino no conectara
 var corsOptions = {
-  origin: ["http://localhost:3000", "http://localhost", "http://localhost:3001"]
+  origin: ["http://localhost:3001", "http://localhost", "http://localhost:3001"]
 };
 app.use(cors(corsOptions));
 
@@ -43,7 +43,7 @@ app.get('/', (req, res) => {
 
 //Inicia el servidor solo si este archivo es el punto de entrada principal
 if (require.main === module) {
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
     console.log(`Servidor iniciado en el puerto ${PORT}`);
   });
