@@ -4,6 +4,8 @@ const logger = require('./middleware/logger');
 const app = express();
 const cors = require('cors');
 
+require('dotenv').config();
+
 //[CORS Configuration]
 //TODO: Añadir IP del Front End desplegado sino no conectara
 app.use(cors());
@@ -27,14 +29,14 @@ const dbClient = new Client({
   port: process.env.PGPORT
 })
 
-// Try connection
-dbClient.connect((err) => {
-  if (err) {
-    console.error("Error de conexión:", err.stack);
-  } else {
-    console.log("Conexión exitosa a la base de datos de PostgreSQL a través de RDS");
-  }
-});
+// // Try connection
+// dbClient.connect((err) => {
+//   if (err) {
+//     console.error("Error de conexión:", err.stack);
+//   } else {
+//     console.log("Conexión exitosa a la base de datos de PostgreSQL a través de RDS");
+//   }
+// });
 
 // [MIDDLEWARE]
 // Use of a logger
