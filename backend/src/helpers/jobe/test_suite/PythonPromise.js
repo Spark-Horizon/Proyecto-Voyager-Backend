@@ -46,10 +46,63 @@ class PythonPromiseDriver extends PythonPromise {
         })
 
         // Creating assertions
-        for (let i = 0; i < this._tests.length; i++)
-            assertions += `    def test_case_${i}(self):\n        self.assertEqual(${this._driver}(${this._inputs[i]}), ${this._outputs[i]})\n\n`;
-        
+        for (let i = 0; i < this._tests.length; i++){
+            assertions += `    def test_case_${i}(self):\n`;
+            assertions += `        actual_output_${i} = ${this._driver}(${this._inputs[i]})\n`;
+            assertions += `        self.assertEqual(actual_output_${i}, ${this._outputs[i]}, "actual_output_${i}=" + str(actual_output_${i}))\n\n`;
+        }        
+
         this._sourceCode['assertions'] = assertions;
+    }
+
+    parseStderr(errString) {
+        console.log('ERRORES', errString);
+        let parsedData = [];
+    
+        const testPattern = /\b(FAIL:).+/g;
+        const failedTests = errString.match(testPattern);
+    
+        const errPattern = /Traceback(.+\s)+\n/g;
+        const assertionErrors = errString.match(errPattern);
+    
+        console.log({
+            failedTests,
+            assertionErrors
+        });
+
+        let testData = {
+            index: null,
+            passed: null,
+            input: null,
+            expectedOutput: null,
+            actualOutput: null
+        }
+    
+        if (failedTests) {
+            failedTests.forEach((ft, index) => {
+                const errorDetails = assertionErrors && assertionErrors[index] ? assertionErrors[index] : 'No error details available';
+                const indexPattern = /\d+/g;
+                const parsedIndex = parseInt(ft.match(indexPattern));
+    
+                testData['index'] = parsedIndex;
+                testData['passed'] = false;
+                testData['input'] = this._inputs[parsedIndex];
+                testData['expectedOutput'] = this._outputs[parsedIndex];
+
+    
+                // Traceback (most recent call last):
+                // File "/home/jobe/runs/jobe_tigA6t/prog.py", line 13, in test_case_2
+                //     self.assertEqual(main_test(3, 2), 6)
+                // AssertionError: 5 != 6 < -------
+
+                parsedData = [...parsedData, testData];
+            });
+        } else {
+            // No se encontraron pruebas fallidas, es decir, todas las pruebas pasaron
+            
+        }
+    
+        return parsedData;
     }
 
     get getPromise() {
