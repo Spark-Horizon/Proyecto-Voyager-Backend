@@ -59,49 +59,61 @@ class PythonPromiseDriver extends PythonPromise {
         console.log('ERRORES', errString);
         let parsedData = [];
     
+        // Failed tests regex
         const testPattern = /\b(FAIL:).+/g;
         const failedTests = errString.match(testPattern);
+        
+        const actualOutputPattern = /: actual_output_(\d+)=(.+)/;
+        const actualOutputString = errString.match(actualOutputPattern);
+
+        //Succesful tests regex
+        const succesPattern = /\b(test_case_(\d+)) \(__main__\.TestMyFunctions\) \.\.\. ok/g;
+        const succesfulTests = errString.match(succesPattern);
     
-        const errPattern = /Traceback(.+\s)+\n/g;
-        const assertionErrors = errString.match(errPattern);
-    
-        console.log({
-            failedTests,
-            assertionErrors
-        });
+        // Pattern to get the test index
+        const indexPattern = /\d+/g;
+        let parsedIndex;
+
 
         let testData = {
             index: null,
             passed: null,
-            input: null,
             expectedOutput: null,
             actualOutput: null
         }
-    
+
+        if (succesfulTests) {
+            console.log('flag')
+            succesfulTests.forEach((st, index) => {
+                parsedIndex = parseInt(st.match(indexPattern));
+                
+                testData['index'] = parsedIndex;
+                testData['passed'] = true;
+                
+                
+                parsedData.push({...testData});
+            })
+        }
+        
         if (failedTests) {
             failedTests.forEach((ft, index) => {
-                const errorDetails = assertionErrors && assertionErrors[index] ? assertionErrors[index] : 'No error details available';
-                const indexPattern = /\d+/g;
-                const parsedIndex = parseInt(ft.match(indexPattern));
+                const outputDetails = actualOutputString && actualOutputString[index] ? actualOutputString[index] : 'No error details available';
+                const parsedOutput = outputDetails.split('=')[1];
+
+                parsedIndex = parseInt(ft.match(indexPattern));
     
                 testData['index'] = parsedIndex;
                 testData['passed'] = false;
-                testData['input'] = this._inputs[parsedIndex];
                 testData['expectedOutput'] = this._outputs[parsedIndex];
+                testData['actualOutput'] = parsedOutput;
 
-    
-                // Traceback (most recent call last):
-                // File "/home/jobe/runs/jobe_tigA6t/prog.py", line 13, in test_case_2
-                //     self.assertEqual(main_test(3, 2), 6)
-                // AssertionError: 5 != 6 < -------
-
-                parsedData = [...parsedData, testData];
+                parsedData.push({...testData});
             });
-        } else {
-            // No se encontraron pruebas fallidas, es decir, todas las pruebas pasaron
-            
         }
     
+        // Sorting parsed data
+        parsedData.sort((a, b) => a.index - b.index);
+
         return parsedData;
     }
 
