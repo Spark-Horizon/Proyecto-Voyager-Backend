@@ -4,7 +4,8 @@
   "description": "iCode web app backend",
   "main": "app.js",
   "scripts": {
-    "test": "mocha --recursive --exit"
+    "test": "mocha --recursive --exit",
+    "start": "node src/app.js"
   },
   "author": "SparkHorizon",
   "license": "MIT",
