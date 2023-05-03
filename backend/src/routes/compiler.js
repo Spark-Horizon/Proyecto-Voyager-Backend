@@ -1,12 +1,12 @@
 const express = require('express');
 
-
 const { submit } = require('../helpers/jobe/submit');
 const { PythonPromiseFactory } = require('../helpers/jobe/test_suite/PythonPromise');
 
 const router = express.Router();
 
 const IP_SERVER = process.env.IP;
+console.log(IP_SERVER)
 
 
 router.get('/', (req, res) => {
@@ -56,11 +56,11 @@ router.post('/problem/run', async (req, res) => {
                 When driver's name is given, a test suite will be generated. This test suite uses the standard error output so the code can be easily pruned.
             */ 
             const response = await pythonPromise.getPromise;
-            const { cmpinfo, stdout, stderr } = response;
+            const { cmpinfo, stdout, stderr } = response.data;
 
             // TO-DO: Parse stderr to return 
 
-            console.log(response)
+            pythonPromise.parseStderr(stderr);
         } catch (error) {
             console.log(error);
         }
@@ -69,8 +69,10 @@ router.post('/problem/run', async (req, res) => {
         pythonPromise.defineInputs();
         try {
             const responses = await Promise.all(pythonPromise.getPromiseArray);
+
             for (const response of responses) {
                 let {cmpinfo, stdout, stderr} = response;
+
                 console.log({cmpinfo, stdout, stderr});
             }
         } catch (error) {
