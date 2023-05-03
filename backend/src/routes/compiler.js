@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { submit } = require('../helpers/jobe/submit');
+const { submit } = require('../helpers/submit');
 const { PythonPromiseFactory } = require('../helpers/jobe/test_suite/PythonPromise');
 
 const router = express.Router();
@@ -58,9 +58,13 @@ router.post('/problem/run', async (req, res) => {
             const response = await pythonPromise.getPromise;
             const { cmpinfo, stdout, stderr } = response.data;
 
-            // TO-DO: Parse stderr to return 
-
-            pythonPromise.parseStderr(stderr);
+            res.send(
+                {
+                    cmpinfo,
+                    stdout,
+                    stderr: pythonPromise.parseStderr(stderr)
+                }
+            )
         } catch (error) {
             console.log(error);
         }
@@ -71,7 +75,7 @@ router.post('/problem/run', async (req, res) => {
             const responses = await Promise.all(pythonPromise.getPromiseArray);
 
             for (const response of responses) {
-                let {cmpinfo, stdout, stderr} = response;
+                let { cmpinfo, stdout, stderr } = response;
 
                 console.log({cmpinfo, stdout, stderr});
             }
