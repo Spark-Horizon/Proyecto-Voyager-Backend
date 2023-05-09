@@ -151,9 +151,9 @@ class PythonPromiseNoDriver extends PythonPromise {
             this._runSpec['run_spec']['input'] = parsedInput;
             this._options['data'] = JSON.stringify(this._runSpec);
 
-            console.log(`
-            options ${JSON.stringify(this._options)}
-            `); //Petitions that are sent to the 
+            // console.log(`
+            // options ${JSON.stringify(this._options)}
+            // `); //Petitions that are sent to the API
 
             this._promises.push(axios(this._options));
         });
