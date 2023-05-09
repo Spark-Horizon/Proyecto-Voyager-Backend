@@ -36,7 +36,7 @@ router.get('/problem/:id_problem', (req, res) => {
     database.
 */
 router.post('/problem/run', async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     const { code, driver, tests } = req.body;
 
     if (!req.body || Object.keys(req.body).length === 0) { 
@@ -57,6 +57,7 @@ router.post('/problem/run', async (req, res) => {
             */ 
             const response = await pythonPromise.getPromise;
             const { cmpinfo, stdout, stderr } = response.data;
+            // console.log({"Compiler Info:": cmpinfo, "Standard Output:": stdout, "Standard Error:": stderr});
 
             res.send(
                 {

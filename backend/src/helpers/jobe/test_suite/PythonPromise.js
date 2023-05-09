@@ -56,7 +56,7 @@ class PythonPromiseDriver extends PythonPromise {
     }
 
     parseStderr(errString) {
-        console.log('ERRORES', errString);
+        // console.log('ERRORES', errString);
         let parsedData = [];
     
         // Failed tests regex
@@ -83,7 +83,7 @@ class PythonPromiseDriver extends PythonPromise {
         }
 
         if (succesfulTests) {
-            console.log('flag')
+            // console.log('flag')
             succesfulTests.forEach((st, index) => {
                 parsedIndex = parseInt(st.match(indexPattern));
                 
