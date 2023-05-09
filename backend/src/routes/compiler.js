@@ -81,7 +81,7 @@ router.post('/problem/run', async (req, res) => {
 
 
             for (const response of responses) {
-                let { cmpinfo, stdout, stderr } = response;
+                let { cmpinfo, stdout, stderr } = response.data;
 
                 console.log({cmpinfo, stdout, stderr});
             }
