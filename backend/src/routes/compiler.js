@@ -73,18 +73,21 @@ router.post('/problem/run', async (req, res) => {
         pythonPromise = promiseFactory.createPromise('noDriver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
         pythonPromise.defineInputs();
         try {
+            //Array to store the results
+            const results = [];
             // console.log(pythonPromise.getPromiseArray);
             const responses = await Promise.all(pythonPromise.getPromiseArray);
-            console.log(responses[0].data);
-            console.log(responses[1].data);
-            console.log(responses[2].data);
-
+            // console.log(responses[0].data);
+            // console.log(responses[1].data);
+            // console.log(responses[2].data);
 
             for (const response of responses) {
                 let { cmpinfo, stdout, stderr } = response.data;
 
                 console.log({cmpinfo, stdout, stderr});
+                results.push({ cmpinfo, stdout, stderr});
             }
+            res.send(results);
         } catch (error) {
             console.log(error)
         }
