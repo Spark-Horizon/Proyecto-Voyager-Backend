@@ -145,11 +145,15 @@ class PythonPromiseNoDriver extends PythonPromise {
     defineInputs() {
         this._tests.forEach(({input:inputTest}) => {
             const parsedInput = inputTest.replace(/,/g, '\n');
-            console.log(`input test ${inputTest}`);
-            console.log(`parsed input ${parsedInput}`);
+            // console.log(`input test ${inputTest}`);
+            // console.log(`parsed input ${parsedInput}`);
 
             this._runSpec['run_spec']['input'] = parsedInput;
             this._options['data'] = JSON.stringify(this._runSpec);
+
+            console.log(`
+            options ${JSON.stringify(this._options)}
+            `); //Petitions that are sent to the 
 
             this._promises.push(axios(this._options));
         });
