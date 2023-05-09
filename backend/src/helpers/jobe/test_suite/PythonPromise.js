@@ -56,7 +56,7 @@ class PythonPromiseDriver extends PythonPromise {
     }
 
     parseStderr(errString) {
-        // console.log('ERRORES', errString);
+        console.log('ERRORES', errString);
         let parsedData = [];
     
         // Failed tests regex
@@ -83,7 +83,7 @@ class PythonPromiseDriver extends PythonPromise {
         }
 
         if (succesfulTests) {
-            // console.log('flag')
+            console.log('flag')
             succesfulTests.forEach((st, index) => {
                 parsedIndex = parseInt(st.match(indexPattern));
                 
@@ -144,7 +144,9 @@ class PythonPromiseNoDriver extends PythonPromise {
 
     defineInputs() {
         this._tests.forEach(({input:inputTest}) => {
-            const parsedInput = inputTest.replace(/,*/, '\n');
+            const parsedInput = inputTest.replace(/,/g, '\n');
+            console.log(`input test ${inputTest}`);
+            console.log(`parsed input ${parsedInput}`);
 
             this._runSpec['run_spec']['input'] = parsedInput;
             this._options['data'] = JSON.stringify(this._runSpec);
