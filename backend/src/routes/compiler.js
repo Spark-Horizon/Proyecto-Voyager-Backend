@@ -48,8 +48,13 @@ router.post('/problem/run', async (req, res) => {
 
     // Defining which type of promise will be resolved
     if (driver !== '') {
+        console.log("driver");
+        console.log(tests);
         pythonPromise = promiseFactory.createPromise('driver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
         pythonPromise.defineAssertions();
+
+        //Array that holds the info for the tests
+        const testsInfo = [];
 
         try {
             /* PYTHON CODE WITH DRIVER
@@ -63,18 +68,29 @@ router.post('/problem/run', async (req, res) => {
                 {
                     cmpinfo,
                     stdout,
-                    stderr: pythonPromise.parseStderr(stderr)
+                    stderr,
+                    testsInfo: pythonPromise.getTestsInfo(stderr)
                 }
             )
         } catch (error) {
             console.log(error);
         }
     } else {
+        console.log("noDriver");
         pythonPromise = promiseFactory.createPromise('noDriver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
         pythonPromise.defineInputs();
         try {
-            //Array to store the results
+            //Array to store the final results
             const results = [];
+            //Array to store the testsInfo
+            const testsInfo = [];
+            //Object to store the testInfo
+            let testInfo = {
+                "index": null,
+                "passed": null,
+                "expectedOutput": null,
+                "actualOutput": null
+            };
             // console.log(pythonPromise.getPromiseArray);
             const responses = await Promise.all(pythonPromise.getPromiseArray);
             // console.log(responses[0].data);
@@ -84,9 +100,10 @@ router.post('/problem/run', async (req, res) => {
             for (const response of responses) {
                 let { cmpinfo, stdout, stderr } = response.data;
 
-                console.log({cmpinfo, stdout, stderr});
+                console.log({cmpinfo, stdout, stderr, testsInfo});
                 results.push({ cmpinfo, stdout, stderr});
             }
+            results.push(testsInfo);
             res.send(results);
         } catch (error) {
             console.log(error)

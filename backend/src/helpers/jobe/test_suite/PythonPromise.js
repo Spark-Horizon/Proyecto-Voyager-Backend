@@ -55,8 +55,8 @@ class PythonPromiseDriver extends PythonPromise {
         this._sourceCode['assertions'] = assertions;
     }
 
-    parseStderr(errString) {
-        console.log('ERRORES', errString);
+    getTestsInfo(errString) {
+        // console.log('ERRORES', errString);
         let parsedData = [];
     
         // Failed tests regex
@@ -83,7 +83,7 @@ class PythonPromiseDriver extends PythonPromise {
         }
 
         if (succesfulTests) {
-            console.log('flag')
+            // console.log('flag')
             succesfulTests.forEach((st, index) => {
                 parsedIndex = parseInt(st.match(indexPattern));
                 
@@ -158,6 +158,21 @@ class PythonPromiseNoDriver extends PythonPromise {
             this._promises.push(axios(this._options));
         });
     }
+
+    getTestsInfo(responses){
+        let parsedData = [];
+
+        let testData = {
+            index: null,
+            passed: null,
+            expectedOutput: null,
+            actualOutput: null
+        }
+
+        return parsedData;
+    }
+
+    
 
     get getPromiseArray() {
         return this._promises;
