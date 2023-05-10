@@ -32,6 +32,23 @@ router.get('/:fil1/:fil2/:fil3/:fil4/:fil5/:order/:hier', async (req, res) => {
     }
 })
 
+router.get('/delete/:id', async (req, res) => {
+    let id = req.params.id
+    try {
+        const client = await pool.connect();
+        const result = await client.query(`DELETE FROM ejercicios WHERE id = $1`, [id]);
+        if (result.rows != null) {
+            res.status(200).json(result);
+        } else {
+            res.status(500).json({ "error": "Query no valida" });
+        }
+        client.release();
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+})
+
 router.get('/filter/autor', async (req, res) => {
     
     try {
