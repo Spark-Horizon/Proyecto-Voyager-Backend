@@ -45,11 +45,10 @@ router.post('/problem/run', async (req, res) => {
 
     let promiseFactory = new PythonPromiseFactory()
     let pythonPromise;
-
     // Defining which type of promise will be resolved
     if (driver !== '') {
         console.log("driver");
-        console.log(tests);
+        // console.log(tests);
         pythonPromise = promiseFactory.createPromise('driver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
         pythonPromise.defineAssertions();
 
@@ -82,26 +81,20 @@ router.post('/problem/run', async (req, res) => {
         try {
             //Array to store the final results
             const results = [];
-            //Array to store the testsInfo
-            const testsInfo = [];
-            //Object to store the testInfo
-            let testInfo = {
-                "index": null,
-                "passed": null,
-                "expectedOutput": null,
-                "actualOutput": null
-            };
             // console.log(pythonPromise.getPromiseArray);
             const responses = await Promise.all(pythonPromise.getPromiseArray);
+            //Array to store the testsInfo
+            const testsInfo = pythonPromise.getTestsInfo(responses, tests);
+            // console.log(`responses are: ${JSON.stringify(responses[0].data['stdout'])}`);
+            // console.log(`responses are: ${JSON.stringify(responses[0].data)}`);
             // console.log(responses[0].data);
             // console.log(responses[1].data);
             // console.log(responses[2].data);
 
             for (const response of responses) {
                 let { cmpinfo, stdout, stderr } = response.data;
-
-                console.log({cmpinfo, stdout, stderr, testsInfo});
-                results.push({ cmpinfo, stdout, stderr});
+                // console.log({cmpinfo, stdout, stderr});
+                results.push({cmpinfo, stdout, stderr});
             }
             results.push(testsInfo);
             res.send(results);

@@ -159,20 +159,22 @@ class PythonPromiseNoDriver extends PythonPromise {
         });
     }
 
-    getTestsInfo(responses){
-        let parsedData = [];
-
-        let testData = {
-            index: null,
-            passed: null,
-            expectedOutput: null,
-            actualOutput: null
-        }
-
-        return parsedData;
-    }
-
-    
+    getTestsInfo(responses, tests) {
+        return responses.map((response, i) => {
+          const { stdout } = response.data;
+          const { output } = tests[i];
+          const passed = stdout === output;
+      
+          console.log(`Actual output: ${stdout}, Expected output: ${output}`);
+      
+          return {
+            index: i,
+            passed,
+            expectedOutput: passed ? null : output,
+            actualOutput: passed ? null : stdout,
+          };
+        });
+      }
 
     get getPromiseArray() {
         return this._promises;
