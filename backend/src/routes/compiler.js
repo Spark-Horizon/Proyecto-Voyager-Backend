@@ -52,9 +52,6 @@ router.post('/problem/run', async (req, res) => {
         pythonPromise = promiseFactory.createPromise('driver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
         pythonPromise.defineAssertions();
 
-        //Array that holds the info for the tests
-        const testsInfo = [];
-
         try {
             /* PYTHON CODE WITH DRIVER
                 When driver's name is given, a test suite will be generated. This test suite uses the standard error output so the code can be easily pruned.
