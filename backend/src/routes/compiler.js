@@ -96,8 +96,13 @@ router.post('/problem/run', async (req, res) => {
                 // console.log({cmpinfo, stdout, stderr});
                 results.push({cmpinfo, stdout, stderr});
             }
-            results.push(testsInfo);
-            res.send(results);
+
+            res.send(
+                {
+                    results,
+                    testsInfo
+                }
+            );
         } catch (error) {
             console.log(error)
         }
