@@ -161,10 +161,10 @@ class PythonPromiseNoDriver extends PythonPromise {
 
     getTestsInfo(responses, tests) {
         return responses.map((response, i) => {
-          const { stdout } = response.data;
+          const stdout = response.data.stdout.replace(/\n$/, ''); // Realiza el reemplazo en la misma línea
           const { output } = tests[i];
-          const passed = stdout === output;
       
+          const passed = stdout === output;
           console.log(`Actual output: ${stdout}, Expected output: ${output}`);
       
           return {
@@ -175,6 +175,7 @@ class PythonPromiseNoDriver extends PythonPromise {
           };
         });
       }
+      
 
     get getPromiseArray() {
         return this._promises;
