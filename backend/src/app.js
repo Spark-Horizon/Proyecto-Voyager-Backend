@@ -7,15 +7,20 @@ const pool = require('../db/index');
 const compilerRouter = require('./routes/compiler');
 const crudRouter = require('./routes/crud');
 
+require('dotenv').config();
+
 //[Express Initialization]
 const app = express();
 
 //[CORS Configuration]
 //TODO: Añadir IP del Front End desplegado sino no conectara
+app.use(cors());
+/*
 var corsOptions = {
   origin: ["http://localhost:3000", "http://localhost", "http://localhost:3001"]
 };
 app.use(cors(corsOptions));
+*/
 
 //[Dotenv Variables Initialization]
 const path = require('path');
@@ -37,14 +42,17 @@ app.use(logger)
 app.use('/compiler', compilerRouter);
 app.use('/crud', crudRouter);
 
+app.use(express.json())
+
+// [ROUTES]
 app.get('/', (req, res) => {
   res.send('Hello world :)');
 });
 
 //Inicia el servidor solo si este archivo es el punto de entrada principal
 if (require.main === module) {
-  const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, '0.0.0.0', () => { // Change this in production [IMPORTANT]
     console.log(`Servidor iniciado en el puerto ${PORT}`);
   });
 }

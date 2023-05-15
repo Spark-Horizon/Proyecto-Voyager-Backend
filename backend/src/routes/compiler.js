@@ -1,11 +1,12 @@
 const express = require('express');
 
-const { submit } = require('../helpers/jobe/submit');
-const { createTestSuite } = require('../helpers/jobe/testSuiteCreation');
-const { parseStderr } = require('../helpers/jobe/parseTestErrors');
+const { submit } = require('../helpers/submit');
+const { PythonPromiseFactory } = require('../helpers/jobe/test_suite/PythonPromise');
 
 const router = express.Router();
 
+const IP_SERVER = process.env.IP;
+console.log(IP_SERVER)
 const pool = require('../../db/index');
 
 router.get('/', (req, res) => {
@@ -44,17 +45,78 @@ router.get('/problem/:id_problem', async (req, res) => {
     code output or errors, it doesn't save the code data on the
     database.
 */
-router.post('/problem/:id_problem/run', async (req, res) => {
-    const body = req.body;
-    const { code, driver, tests } = body;
 
-    if (code == '')
-        return res.send('No code to execute!')
+router.post('/problem/run', async (req, res) => {
+    // console.log(req.body);
+    const { code, driver, tests } = req.body;
 
-    const suite = createTestSuite(code, driver, tests);
-    const { compinfo, stdout, stderr } = await submit(suite);
+    if (!req.body || Object.keys(req.body).length === 0) { 
+        return res.status(400).send('Body data is undefined');
+    }      
 
-    /* Parse compiler output
+    let promiseFactory = new PythonPromiseFactory()
+    let pythonPromise;
+    // Defining which type of promise will be resolved
+    if (driver !== '') {
+        console.log("driver");
+        // console.log(tests);
+        pythonPromise = promiseFactory.createPromise('driver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
+        pythonPromise.defineAssertions();
+
+        try {
+            /* PYTHON CODE WITH DRIVER
+                When driver's name is given, a test suite will be generated. This test suite uses the standard error output so the code can be easily pruned.
+            */ 
+            const response = await pythonPromise.getPromise;
+            const { cmpinfo, stdout, stderr } = response.data;
+            // console.log({"Compiler Info:": cmpinfo, "Standard Output:": stdout, "Standard Error:": stderr});
+
+            res.send(
+                {
+                    cmpinfo,
+                    stdout,
+                    stderr,
+                    testsInfo: pythonPromise.getTestsInfo(stderr)
+                }
+            )
+        } catch (error) {
+            console.log(error);
+        }
+    } else {
+        console.log("noDriver");
+        pythonPromise = promiseFactory.createPromise('noDriver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
+        pythonPromise.defineInputs();
+        try {
+            //Array to store the final results
+            const results = [];
+            // console.log(pythonPromise.getPromiseArray);
+            const responses = await Promise.all(pythonPromise.getPromiseArray);
+            //Array to store the testsInfo
+            const testsInfo = pythonPromise.getTestsInfo(responses, tests);
+            // console.log(`responses are: ${JSON.stringify(responses[0].data['stdout'])}`);
+            // console.log(`responses are: ${JSON.stringify(responses[0].data)}`);
+            // console.log(responses[0].data);
+            // console.log(responses[1].data);
+            // console.log(responses[2].data);
+
+            for (const response of responses) {
+                let { cmpinfo, stdout, stderr } = response.data;
+                // console.log({cmpinfo, stdout, stderr});
+                results.push({cmpinfo, stdout, stderr});
+            }
+
+            res.send(
+                {
+                    results,
+                    testsInfo
+                }
+            );
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    /* Compiler output
         The compiler can throw diferent types of output:
         - compinfo
             - Information about the compiler i.e. syntax erros.
@@ -63,21 +125,6 @@ router.post('/problem/:id_problem/run', async (req, res) => {
         - stderr
             - Errors occured inside the test suite.
     */
-    if (stderr) {
-        const parsedError = parseStderr(stderr);
-
-        res.send({
-            parsedError
-        })
-    } else if (compinfo) {
-        res.send({
-            compinfo
-        });
-    } else {
-        res.send({
-            stdout
-        })
-    }
 })
 
 
