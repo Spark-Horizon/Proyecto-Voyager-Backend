@@ -7,6 +7,7 @@ const pool = require('../db/index');
 const compilerRouter = require('./routes/compiler');
 const crudRouter = require('./routes/crud');
 
+//[Dotenv Variables Initialization]
 require('dotenv').config();
 
 //[Express Initialization]
@@ -21,10 +22,6 @@ var corsOptions = {
 };
 app.use(cors(corsOptions));
 */
-
-//[Dotenv Variables Initialization]
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 //[Database Test Connection]
 pool.connect((err) => {
