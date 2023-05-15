@@ -7,7 +7,7 @@ const router = express.Router();
 
 const IP_SERVER = process.env.IP;
 console.log(IP_SERVER)
-
+const pool = require('../../db/index');
 
 router.get('/', (req, res) => {
     res.send('compiler route working')
@@ -18,15 +18,25 @@ router.get('/', (req, res) => {
     the client with that data. It also saves data in the cache in order
     to reduce the amount of querys.
 */
-router.get('/problem/:id_problem', (req, res) => {
-    const id_problem = req.params.id_problem;
+router.get('/problem/:id_problem', async (req, res) => {
+    let id = req.params.id_problem
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT archivo FROM ejercicios WHERE id = $1', [id])
+        if (result.rows[0] != null) {
+            res.status(200).json(result.rows[0])
+        } else {
+            res.status(500).json({ "error": "Problem id no valido" })
+        }
+        client.release();
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err)
+    }
 
     /* Database query - replace 0 with data retrieved from the query
         Use id_problem to retrieve specific information about a problem
     */
-    const data = 0;
-
-    return data;
 })
 
 
@@ -35,6 +45,7 @@ router.get('/problem/:id_problem', (req, res) => {
     code output or errors, it doesn't save the code data on the
     database.
 */
+
 router.post('/problem/run', async (req, res) => {
     // console.log(req.body);
     const { code, driver, tests } = req.body;

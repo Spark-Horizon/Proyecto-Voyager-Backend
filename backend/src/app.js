@@ -1,46 +1,46 @@
-// [IMPORTS]
+//[Package Imports]
 const express = require('express');
-const logger = require('./middleware/logger');
-const app = express();
 const cors = require('cors');
+//[File Imports]
+const logger = require('./middleware/logger');
+const pool = require('../db/index');
+const compilerRouter = require('./routes/compiler');
+const crudRouter = require('./routes/crud');
 
 require('dotenv').config();
+
+//[Express Initialization]
+const app = express();
 
 //[CORS Configuration]
 //TODO: Añadir IP del Front End desplegado sino no conectara
 app.use(cors());
+/*
+var corsOptions = {
+  origin: ["http://localhost:3000", "http://localhost", "http://localhost:3001"]
+};
+app.use(cors(corsOptions));
+*/
 
-// [ROUTES IMPORTS]
-const compilerRouter = require('./routes/compiler');
-
-// [DATA BASE CONNECTION]
-// For RDS (AWS) database service connection
+//[Dotenv Variables Initialization]
 const path = require('path');
-
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-const { Client } = require('pg');
+//[Database Test Connection]
+pool.connect((err) => {
+  if (err) {
+    console.error("Error de conexión:", err.stack);
+  } else {
+    console.log("Conexión exitosa a la base de datos de PostgreSQL a través de RDS");
+  }
+});
 
-const dbClient = new Client({
-  user: process.env.PGUSER,
-  host: process.env.PGHOST,
-  database: process.env.PGDATABASE,
-  password: process.env.PGPASSWORD,
-  port: process.env.PGPORT
-})
+//[MiddleWare Initialization]
+app.use(logger)
 
-// // Try connection
-// dbClient.connect((err) => {
-//   if (err) {
-//     console.error("Error de conexión:", err.stack);
-//   } else {
-//     console.log("Conexión exitosa a la base de datos de PostgreSQL a través de RDS");
-//   }
-// });
-
-// [MIDDLEWARE]
-// Use of a logger
-app.use(logger);
+//[Routing Initialization]
+app.use('/compiler', compilerRouter);
+app.use('/crud', crudRouter);
 
 app.use(express.json())
 
@@ -49,9 +49,7 @@ app.get('/', (req, res) => {
   res.send('Hello world :)');
 });
 
-app.use('/compiler', compilerRouter);
-
-// Inicia el servidor solo si este archivo es el punto de entrada principal
+//Inicia el servidor solo si este archivo es el punto de entrada principal
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, '0.0.0.0', () => { // Change this in production [IMPORTANT]
@@ -60,4 +58,3 @@ if (require.main === module) {
 }
 
 module.exports = app;
-
