@@ -6,6 +6,7 @@ const { parseStderr } = require('../helpers/jobe/parseTestErrors');
 
 const router = express.Router();
 
+const pool = require('../../db/index');
 
 router.get('/', (req, res) => {
     res.send('compiler route working')
@@ -16,15 +17,25 @@ router.get('/', (req, res) => {
     the client with that data. It also saves data in the cache in order
     to reduce the amount of querys.
 */
-router.get('/problem/:id_problem', (req, res) => {
-    const id_problem = req.params.id_problem;
+router.get('/problem/:id_problem', async (req, res) => {
+    let id = req.params.id_problem
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT archivo FROM ejercicios WHERE id = $1', [id])
+        if (result.rows[0] != null) {
+            res.status(200).json(result.rows[0])
+        } else {
+            res.status(500).json({ "error": "Problem id no valido" })
+        }
+        client.release();
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err)
+    }
 
     /* Database query - replace 0 with data retrieved from the query
         Use id_problem to retrieve specific information about a problem
     */
-    const data = 0;
-
-    return data;
 })
 
 
@@ -41,7 +52,7 @@ router.post('/problem/:id_problem/run', async (req, res) => {
         return res.send('No code to execute!')
 
     const suite = createTestSuite(code, driver, tests);
-    const {compinfo, stdout, stderr} = await submit(suite);
+    const { compinfo, stdout, stderr } = await submit(suite);
 
     /* Parse compiler output
         The compiler can throw diferent types of output:
