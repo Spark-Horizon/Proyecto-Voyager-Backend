@@ -34,12 +34,12 @@ pool.connect((err) => {
 
 //[MiddleWare Initialization]
 app.use(logger)
+app.use(express.json())
 
 //[Routing Initialization]
 app.use('/compiler', compilerRouter);
 app.use('/crud', crudRouter);
 
-app.use(express.json())
 
 // [ROUTES]
 app.get('/', (req, res) => {
