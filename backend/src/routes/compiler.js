@@ -48,11 +48,12 @@ router.get('/problem/:id_problem', async (req, res) => {
 
 router.post('/problem/run', async (req, res) => {
     // console.log(req.body);
-    const { code, driver, tests } = req.body;
-
     if (!req.body || Object.keys(req.body).length === 0) { 
         return res.status(400).send('Body data is undefined');
-    }      
+    }
+    
+    const { code, driver, tests } = req.body;
+
 
     let promiseFactory = new PythonPromiseFactory()
     let pythonPromise;
