@@ -32,23 +32,6 @@ router.get('/:fil1/:fil2/:fil3/:fil4/:fil5/:order/:hier', async (req, res) => {
     }
 })
 
-router.get('/delete/:id', async (req, res) => {
-    let id = req.params.id
-    try {
-        const client = await pool.connect();
-        const result = await client.query(`DELETE FROM ejercicios WHERE id = $1`, [id]);
-        if (result.rows != null) {
-            res.status(200).json(result);
-        } else {
-            res.status(500).json({ "error": "Query no valida" });
-        }
-        client.release();
-    } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
-    }
-})
-
 router.get('/filter/autor', async (req, res) => {
     
     try {
@@ -70,7 +53,7 @@ router.get('/filter/subtema', async (req, res) => {
     
     try {
         const client = await pool.connect();
-        const result = await client.query(`SELECT DISTINCT s.nombre FROM ejercicios e JOIN subtemas s ON e.id_subtema = s.id;`);
+        const result = await client.query(`SELECT DISTINCT s.nombre, e.id_subtema FROM ejercicios e JOIN subtemas s ON e.id_subtema = s.id;`);
         if (result.rows != null) {
             res.status(200).json(result.rows);
         } else {
@@ -124,6 +107,62 @@ router.get('/filter/autorizacion', async (req, res) => {
         const result = await client.query(`SELECT DISTINCT autorizado FROM ejercicios;`);
         if (result.rows != null) {
             res.status(200).json(result.rows);
+        } else {
+            res.status(500).json({ "error": "Query no valida" });
+        }
+        client.release();
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+})
+
+router.delete('/delete/:id', async (req, res) => {
+    let id = req.params.id
+    try {
+        const client = await pool.connect();
+        const result = await client.query(`DELETE FROM ejercicios WHERE id = $1`, [id]);
+        if (result.rows != null) {
+            res.status(200).json(result);
+        } else {
+            res.status(500).json({ "error": "Query no valida" });
+        }
+        client.release();
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+})
+
+router.post('/create/:autorizado/:tipo/:subtema/:author/:title/:description/:difficulty/:driver/:tests', async (req, res) => {
+    let autorizado = req.params.autorizado;
+    let tipo = req.params.tipo;
+    let subtema = req.params.tests.split(',');
+    let author = req.params.author;
+    let title = req.params.title;
+    let description = req.params.description;
+    let difficulty = req.params.difficulty;
+    let driver = req.params.driver;
+    let tests = req.params.tests;
+
+    try {
+
+        const jsonData = {
+            "author": author,
+            "title": title,
+            "description": description,
+            "topic": subtema[0],
+            "difficulty": difficulty,
+            "driver": driver,
+            "tests": tests
+        }
+
+        const jsonString = JSON.stringify(jsonData);
+
+        const client = await pool.connect();
+        const result = await client.query(`CALL agregarEjercicio($1, $2, $3, $4)`, [autorizado, tipo, jsonString, subtema[1]]);
+        if (result.rows != null) {
+            res.status(200).json(result);
         } else {
             res.status(500).json({ "error": "Query no valida" });
         }
