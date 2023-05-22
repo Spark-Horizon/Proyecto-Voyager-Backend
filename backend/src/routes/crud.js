@@ -32,6 +32,24 @@ router.get('/:fil1/:fil2/:fil3/:fil4/:fil5/:order/:hier', async (req, res) => {
     }
 })
 
+router.get('/exercise/:id', async (req, res) => {
+    let id = req.params.id;
+    
+    try {
+        const client = await pool.connect();
+        const result = await client.query(`SELECT * FROM ejercicios WHERE id = $1`, [id]);
+        if (result.rows != null) {
+            res.status(200).json(result.rows);
+        } else {
+            res.status(500).json({ "error": "Query no valida" });
+        }
+        client.release();
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+})
+
 router.get('/filter/autor', async (req, res) => {
     
     try {
@@ -257,6 +275,7 @@ router.put('/update/code/:id/:autorizado/:tipo/:subtema/:author/:title/:descript
 })
 
 router.put('/update/om/:id/:autorizado/:tipo/:subtema/:author/:title/:description/:difficulty/:answer/:hints/:options', async (req, res) => {
+    console.log('pues aca si llegue wtf 1');
     let id = req.params.id;
     let autorizado = req.params.autorizado;
     let tipo = req.params.tipo;
