@@ -244,8 +244,6 @@ router.put('/update/code/:id/:autorizado/:tipo/:subtema/:author/:title/:descript
     let driver = req.params.driver;
     let tests = req.params.tests;
 
-    console.log('pues aca si llegue wtf pero en codigo');
-
     try {
 
         const jsonData = {
@@ -275,7 +273,6 @@ router.put('/update/code/:id/:autorizado/:tipo/:subtema/:author/:title/:descript
 })
 
 router.put('/update/om/:id/:autorizado/:tipo/:subtema/:author/:title/:description/:difficulty/:answer/:hints/:options', async (req, res) => {
-    console.log('pues aca si llegue wtf 1');
     let id = req.params.id;
     let autorizado = req.params.autorizado;
     let tipo = req.params.tipo;
@@ -287,8 +284,6 @@ router.put('/update/om/:id/:autorizado/:tipo/:subtema/:author/:title/:descriptio
     let answer = req.params.answer;
     let hints = req.params.hints;
     let options = req.params.options;
-
-    console.log('pues aca si llegue wtf');
 
     try {
 
