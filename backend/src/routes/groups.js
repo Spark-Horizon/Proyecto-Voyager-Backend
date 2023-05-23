@@ -4,9 +4,20 @@ const router = express.Router();
 
 const pool = require('../../db/index');
 
-//Route for testing if route is working
-router.get('/', (req, res) => {
-    res.send('groups route working');
+//Route for getting groups
+router.get('/', async (req, res) => {
+    //Code to get the groups
+    let client; //Declare the client variable
+    try{
+        client = await pool.connect();
+        const result = await client.query('SELECT * FROM grupos');
+        res.status(201).json(result.rows);
+    }catch (err){
+        console.error(err);
+        res.status(500).json({ error: 'Error getting the data' });
+    }finally{
+        client.release();
+    }
 });
 
 //Route for post(button to create a group)
