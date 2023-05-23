@@ -44,4 +44,26 @@ router.post('/', async (req,res) => {
     }
 });
 
+// Route for delete
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+  
+    if (!id) {
+      return res.status(400).json({ error: 'No id provided' });
+    }
+  
+    let client; // Declare the client variable
+    try {
+      client = await pool.connect();
+      await client.query('DELETE FROM grupos WHERE id = $1', [id]);
+      res.status(200).json({ message: 'Group deleted successfully' });
+    } catch (err) {
+      console.error('Error deleting the group', err);
+      res.status(500).json({ error: 'Server Internal Error' });
+    } finally {
+      client.release();
+    }
+  });
+  
+
 module.exports = router;
