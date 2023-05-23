@@ -11,7 +11,7 @@ router.get('/:id_docente', async (req, res) => {
     try{
         client = await pool.connect();
         const result = await client.query('SELECT * FROM grupos WHERE id_docente = $1', [id_docente]);
-        res.status(201).json(result.rows);
+        res.status(200).json(result.rows);
     }catch (err){
         console.error(err);
         res.status(500).json({ error: 'Error getting the data' });
@@ -22,7 +22,7 @@ router.get('/:id_docente', async (req, res) => {
 
 //Route for post(button to create a group)
 router.post('/', async (req,res) => {
-    const {idMateriaGrupo, visibleGrupo, user} = await req.body; 
+    const {idMateriaGrupo, visibleGrupo, user} = req.body; 
     //Checking if all data is present
     if (!idMateriaGrupo || !user.id || typeof visibleGrupo === 'undefined'){
         return res.status(400).json({ error: 'Entry data not valid'});
@@ -45,7 +45,7 @@ router.post('/', async (req,res) => {
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
   
-    if (!id) {
+    if (!id || id==='') {
       return res.status(400).json({ error: 'No id provided' });
     }
   
