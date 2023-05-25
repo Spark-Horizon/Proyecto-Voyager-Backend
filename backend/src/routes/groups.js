@@ -14,14 +14,17 @@ const GET_TEACHER_QUERY = 'SELECT * FROM grupos WHERE id_docente = $1';
 const ADD_GROUP_PROCEDURE = `CALL agregarGrupo($1, $2, $3)`;
 const ADD_STUDENT_TO_GROUP_PROCEDURE = `CALL agregarEstudianteGrupo($1, $2)`;
 
-//DELETE QUERYS
-
+// DELETE QUERYS
+const DELETE_GROUP_QUERY = 'DELETE FROM grupos WHERE id = $1';
+const EXIT_GROUP_QUERY = 'DELETE FROM estudiantes_grupos WHERE id_estudiante = $1 AND id_grupo = (SELECT id FROM grupos WHERE codigo = $2)';
 
 //Route for getting groups from the actual user
 //The user could be a student or a teacher
 router.get('/:role/:id', async (req, res, next) => {
   const { role, id } = req.params;
   let query;
+
+  if (!(role && role.trim() && id)) return res.status(404).json({ error: 'Incompleted data' });
 
   switch (role) {
     case 'student':
@@ -45,50 +48,23 @@ router.get('/:role/:id', async (req, res, next) => {
   }
 });
 
-//Route for post(button to create a group) if teacher
-//Route for post(button to enter to a group) if student
-//To enter to a group we need to call the procedure agregarEstudianteGrupo(IN codigo_grupo TEXT, IN id_estudiante_nuevo VARCHAR(10))
-//Teacher JSON for post:
-// {
-//   "idMateriaGrupo": "TC1028",
-//   "visibleGrupo": true,
-//   "user" : {
-//   "id": "L01732005",
-//   "name": "Francisco",
-//   "lastname1": "Rocha",
-//   "lastname2": "Juárez",
-//   "role": "teacher"
-//   }
-// }
-//Student JSON for post:
-// {
-//  "codigoGrupo": "DEE8C67B",
-//   "user" : {
-//   "id": "A01732007",
-//   "name": "Francisco",
-//   "lastname1": "Rocha",
-//   "lastname2": "Juárez",
-//   "role": "student"
-//   }
-// }
 
 router.post('/', async (req, res) => {
   const { idMateriaGrupo, visibleGrupo, codigoGrupo, user } = req.body;
   let client;
 
-  if (!user || !user.role) {
-    return res.status(400).json({ error: 'Role missing in user data' });
-  }
+  if (!(user && user.role && user.role.trim())) return res.status(400).json({ error: 'Incomplete Data' });
+
 
   const { role, id } = user;
 
-  switch (role){
+  switch (role) {
     case 'student':
       // Verify if data is present
       if (!codigoGrupo || !id) {
         return res.status(400).json({ error: 'Entry data not valid for student' });
       }
-      
+
       try {
         client = await pool.connect();
         await client.query(ADD_STUDENT_TO_GROUP_PROCEDURE, [codigoGrupo, id]);
@@ -126,27 +102,59 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Route for delete (button to delete a group) if teacher
-//Route for delete (button to get out of the group) if student
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
 
-  if (!id || id === '') {
-    return res.status(400).json({ error: 'No id provided' });
+// Route for delete (button to delete a group) if teacher
+// Route for delete (button to get out of the group) if student
+router.delete('/:role/:id/:codigo?', async (req, res) => {
+  const { id, role, codigo } = req.params;
+
+  // validate parameters
+  if (!role || !role.trim() || !id || !id.trim()) {
+    return res.status(400).json({ error: 'Incomplete data' });
   }
 
-  let client; // Declare the client variable
+  let query, message, errorMessage, client, params;
+  switch (role) {
+    case 'student':
+      if (!codigo || !codigo.trim()) {
+        return res.status(400).json({ error: 'Group code is required for student' });
+      }
+      query = EXIT_GROUP_QUERY;
+      params = [id, codigo];
+      message = 'ABANDONED GROUP SUCCESFULLY';
+      errorMessage = 'Error leaving the group';
+      break;
+
+    case 'teacher':
+      query = DELETE_GROUP_QUERY;
+      params = [id];
+      message = 'DELETED GROUP SUCCESFULLY';
+      errorMessage = 'Error deleting the group';
+      break;
+
+    default:
+      return res.status(400).json({ error: 'Not a valid role' });
+  }
+
   try {
     client = await pool.connect();
-    await client.query('DELETE FROM grupos WHERE id = $1', [id]);
-    res.status(200).json({ message: 'Group deleted successfully' });
+    const result = await client.query(query, params);
+    
+    if (result.rowCount === 0) {
+      res.status(404).json({ error: 'No group found matching the provided parameters' });
+    } else {
+      res.status(200).json({ message });
+    }
   } catch (err) {
-    console.error('Error deleting the group', err);
+    console.error(errorMessage, err);
     res.status(500).json({ error: 'Server Internal Error' });
   } finally {
-    client.release();
+    if (client) {
+      client.release();
+    }
   }
 });
+
 
 
 module.exports = router;
