@@ -26,4 +26,22 @@ router.get('/pending/:id', async (req, res) => {
     }
 })
 
+router.get('/activitysum/:id', async (req, res) => {
+    let id = req.params.id;
+    
+    try {
+        const client = await pool.connect();
+        const result = await client.query(`SELECT * FROM obtenerResumenActividadesEstudiante($1)`, [id]);
+        if (result.rows != null) {
+            res.status(200).json(result.rows);
+        } else {
+            res.status(500).json({ "error": "Query no valida" });
+        }
+        client.release();
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+})
+
 module.exports = router;
