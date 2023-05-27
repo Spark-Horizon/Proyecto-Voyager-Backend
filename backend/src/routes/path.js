@@ -13,7 +13,7 @@ router.get('/materia/:materia/', async (req, res) => {
     try {
         const client = await pool.connect()
         const result = await client.query(`
-            SELECT subtemas.id, subtemas.nombre, subtemas.id_tema, temas.nombre AS tema_nombre
+            SELECT subtemas.id, subtemas.nombre, subtemas.id_tema, temas.nombre AS tema_nombre, subtemas.racha_om, subtemas.requeridos_om, subtemas.racha_codigo, subtemas.requeridos_codigo
             FROM materias
             INNER JOIN temas ON materias.id = temas.id_materia
             INNER JOIN subtemas ON temas.id = subtemas.id_tema
@@ -39,7 +39,12 @@ router.get('/unlocked/:matricula/:materia/', async (req, res) => {
     try {
         const client = await pool.connect()
         const result = await client.query(`
-            SELECT estudiantes_subtemas.id_subtema, estudiantes_subtemas.superado
+            SELECT estudiantes_subtemas.id_subtema,
+                   estudiantes_subtemas.racha_om AS user_racha_om,
+                   estudiantes_subtemas.progreso_om AS user_progreso_om,
+                   estudiantes_subtemas.racha_codigo AS user_racha_codigo,
+                   estudiantes_subtemas.progreso_codigo AS user_progreso_codigo,
+                   estudiantes_subtemas.superado
             FROM estudiantes_subtemas
             INNER JOIN subtemas ON estudiantes_subtemas.id_subtema = subtemas.id
             INNER JOIN temas ON subtemas.id_tema = temas.id
