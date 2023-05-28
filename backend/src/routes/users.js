@@ -17,7 +17,8 @@ router.post('/', async (req, res) => {
 
     if (!(id && name && lastName1 && lastName2 && role))
         return res.status(400).json({ error: 'Incomplete Data' });
-    
+
+    // Establish a query based on 'role'
     switch (role) {
         case 'student':
             query = ADD_STUDENT_PROCEDURE;
@@ -28,7 +29,8 @@ router.post('/', async (req, res) => {
         default:
             return res.status(404).json({ error: 'Not a valid role' });
         }
-        
+                
+    // User creation on db using the specified query
     try {
         client = await pool.connect();
         await client.query(query, [id, name, lastName1, lastName2]);
