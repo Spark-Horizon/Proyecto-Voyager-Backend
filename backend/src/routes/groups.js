@@ -105,6 +105,7 @@ router.post('/', async (req, res) => {
 
 // Route for delete (button to delete a group) if teacher
 // Route for delete (button to get out of the group) if student
+//The code just works when you want do exit a group as student
 router.delete('/:role/:id/:codigo?', async (req, res) => {
   const { id, role, codigo } = req.params;
 
