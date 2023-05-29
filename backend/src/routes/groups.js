@@ -156,6 +156,20 @@ router.delete('/:role/:id/:codigo?', async (req, res) => {
   }
 });
 
+router.get('/subjects', async (req, res, next) => {
+  let client;
+  try{
+    client = await pool.connect();
+    const result = await client.query('SELECT * FROM materias');
+    res.status(200).json(result.rows);
+  }catch (error){
+    console.error(error);
+    next(error);
+  }finally{
+    client.release();
+  }
+});
+
 
 
 module.exports = router;
