@@ -6,6 +6,7 @@ const logger = require('./middleware/logger');
 const pool = require('../db/index');
 const compilerRouter = require('./routes/compiler');
 const crudRouter = require('./routes/crud');
+const pathRouter = require('./routes/path');
 const usersRouter = require('./routes/users');
 
 //[Dotenv Variables Initialization]
@@ -40,6 +41,7 @@ app.use(express.json())
 //[Routing Initialization]
 app.use('/compiler', compilerRouter);
 app.use('/crud', crudRouter);
+app.use('/path', pathRouter);
 app.use('/users', usersRouter);
 
 
