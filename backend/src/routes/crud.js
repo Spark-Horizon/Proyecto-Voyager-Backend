@@ -152,165 +152,148 @@ router.delete('/delete/:id', async (req, res) => {
     }
 })
 
-router.post('/create/code/:autorizado/:tipo/:subtema/:author/:title/:description/:difficulty/:driver/:tests', async (req, res) => {
-    let autorizado = req.params.autorizado;
-    let tipo = req.params.tipo;
-    let subtema = req.params.subtema.split(',');
-    let author = req.params.author;
-    let title = req.params.title;
-    let description = req.params.description;
-    let difficulty = req.params.difficulty;
-    let driver = req.params.driver;
-    let tests = req.params.tests;
+router.post('/create/code', async (req, res) => {
+    
+    const { autorizado, tipo, subtema, author, title, description, difficulty, driver, tests } = req.body;
+    let client;
+
+    if (!(tipo && subtema && author && title && description && difficulty && driver && tests))
+        return res.status(400).json({ error: 'Incomplete Data' });
+
+    const jsonData = {
+        "author": author,
+        "title": title,
+        "description": description,
+        "topic": subtema[1],
+        "difficulty": difficulty,
+        "driver": driver,
+        "tests": JSON.parse(tests)
+    }
+
+    console.log(jsonData);
+
+    const jsonString = JSON.stringify(jsonData);
 
     try {
-
-        const jsonData = {
-            "author": author,
-            "title": title,
-            "description": description,
-            "topic": subtema[1],
-            "difficulty": difficulty,
-            "driver": driver,
-            "tests": JSON.parse(tests)
-        }
-
-        const jsonString = JSON.stringify(jsonData);
-
-        const client = await pool.connect();
-        const result = await client.query(`CALL agregarEjercicio($1, $2, $3, $4)`, [autorizado, tipo, jsonString, subtema[0]]);
-        if (result.rows != null) {
-            res.status(200).json(result);
-        } else {
-            res.status(500).json({ "error": "Query no valida" });
-        }
-        client.release();
+        client = await pool.connect();
+        console.log([autorizado, tipo, jsonString, subtema[0]]);
+        await client.query(`CALL agregarEjercicio($1, $2, $3::json, $4)`, [autorizado, tipo, jsonString, subtema[0]]);        
+        res.status(201).json({message: 'Code exercise added to database successfully'})
     } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
+        await client.query('ROLLBACK');
+        console.error('Error adding exercise to database', err);
+        res.status(500).json({ error: 'Server Internal Error' })
+    } finally {
+        client.release();
     }
 })
 
-router.post('/create/om/:autorizado/:tipo/:subtema/:author/:title/:description/:difficulty/:answer/:hints/:options', async (req, res) => {
-    let autorizado = req.params.autorizado;
-    let tipo = req.params.tipo;
-    let subtema = req.params.subtema.split(',');
-    let author = req.params.author;
-    let title = req.params.title;
-    let description = req.params.description;
-    let difficulty = req.params.difficulty;
-    let answer = req.params.answer;
-    let hints = req.params.hints;
-    let options = req.params.options;
+router.post('/create/om', async (req, res) => {
+    const { autorizado, tipo, subtema, author, title, description, difficulty, answer, hints, options } = req.body;
+    let client;
+
+    if (!(tipo && subtema && author && title && description && difficulty && answer && options))
+        return res.status(400).json({ error: 'Incomplete Data' });
+
+    const jsonData = {
+        "author": author,
+        "title": title,
+        "description": description,
+        "topic": subtema[1],
+        "difficulty": difficulty,
+        "answer": answer,
+        "hints": hints,
+        "options": JSON.parse(options)
+    }
+
+    console.log(jsonData);
+
+    const jsonString = JSON.stringify(jsonData);
 
     try {
-
-        const jsonData = {
-            "author": author,
-            "title": title,
-            "description": description,
-            "topic": subtema[1],
-            "difficulty": difficulty,
-            "answer": answer,
-            "hints": hints,
-            "options": JSON.parse(options)
-        }
-
-        const jsonString = JSON.stringify(jsonData);
-
-        const client = await pool.connect();
-        const result = await client.query(`CALL agregarEjercicio($1, $2, $3, $4)`, [autorizado, tipo, jsonString, subtema[0]]);
-        if (result.rows != null) {
-            res.status(200).json(result);
-        } else {
-            res.status(500).json({ "error": "Query no valida" });
-        }
-        client.release();
+        client = await pool.connect();
+        console.log([autorizado, tipo, jsonString, subtema[0]]);
+        await client.query(`CALL agregarEjercicio($1, $2, $3::json, $4)`, [autorizado, tipo, jsonString, subtema[0]]);        
+        res.status(201).json({message: 'OM exercise added to database successfully'})
     } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
+        await client.query('ROLLBACK');
+        console.error('Error adding exercise to database', err);
+        res.status(500).json({ error: 'Server Internal Error' })
+    } finally {
+        client.release();
     }
 })
 
-router.put('/update/code/:id/:autorizado/:tipo/:subtema/:author/:title/:description/:difficulty/:driver/:tests', async (req, res) => {
-    let id = req.params.id;
-    let autorizado = req.params.autorizado;
-    let tipo = req.params.tipo;
-    let subtema = req.params.subtema.split(',');
-    let author = req.params.author;
-    let title = req.params.title;
-    let description = req.params.description;
-    let difficulty = req.params.difficulty;
-    let driver = req.params.driver;
-    let tests = req.params.tests;
+router.put('/update/code', async (req, res) => {
+    
+    const { id, autorizado, tipo, subtema, author, title, description, difficulty, driver, tests } = req.body;
+    let client;
+
+    if (!(id && tipo && subtema && author && title && description && difficulty && driver && tests))
+        return res.status(400).json({ error: 'Incomplete Data' });
+
+    const jsonData = {
+        "author": author,
+        "title": title,
+        "description": description,
+        "topic": subtema[1],
+        "difficulty": difficulty,
+        "driver": driver,
+        "tests": JSON.parse(tests)
+    }
+
+    console.log(jsonData);
+
+    const jsonString = JSON.stringify(jsonData);
 
     try {
-
-        const jsonData = {
-            "author": author,
-            "title": title,
-            "description": description,
-            "topic": subtema[1],
-            "difficulty": difficulty,
-            "driver": driver,
-            "tests": JSON.parse(tests)
-        }
-
-        const jsonString = JSON.stringify(jsonData);
-
-        const client = await pool.connect();
-        const result = await client.query(`CALL actualizarEjercicio($1, $2, $3, $4, $5)`, [id, autorizado, tipo, jsonString, subtema[0]]);
-        if (result.rows != null) {
-            res.status(200).json(result);
-        } else {
-            res.status(500).json({ "error": "Query no valida" });
-        }
-        client.release();
+        client = await pool.connect();
+        console.log([id, autorizado, tipo, jsonString, subtema[0]]);
+        await client.query(`CALL actualizarEjercicio($1, $2, $3, $4::json, $5)`, [id, autorizado, tipo, jsonString, subtema[0]]);    
+        res.status(201).json({message: 'Code exercise updated to database successfully'})
     } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
+        await client.query('ROLLBACK');
+        console.error('Error updating exercise to database', err);
+        res.status(500).json({ error: 'Server Internal Error' })
+    } finally {
+        client.release();
     }
 })
 
-router.put('/update/om/:id/:autorizado/:tipo/:subtema/:author/:title/:description/:difficulty/:answer/:hints/:options', async (req, res) => {
-    let id = req.params.id;
-    let autorizado = req.params.autorizado;
-    let tipo = req.params.tipo;
-    let subtema = req.params.subtema.split(',');
-    let author = req.params.author;
-    let title = req.params.title;
-    let description = req.params.description;
-    let difficulty = req.params.difficulty;
-    let answer = req.params.answer;
-    let hints = req.params.hints;
-    let options = req.params.options;
+router.put('/update/om', async (req, res) => {
+    const { id, autorizado, tipo, subtema, author, title, description, difficulty, answer, hints, options } = req.body;
+    let client;
+
+    if (!(id && tipo && subtema && author && title && description && difficulty && answer && options)){
+        return res.status(400).json({ error: 'Incomplete Data' });
+    }
+
+    const jsonData = {
+        "author": author,
+        "title": title,
+        "description": description,
+        "topic": subtema[1],
+        "difficulty": difficulty,
+        "answer": answer,
+        "hints": hints,
+        "options": JSON.parse(options)
+    }
+
+    console.log(jsonData);
+
+    const jsonString = JSON.stringify(jsonData);
 
     try {
-
-        const jsonData = {
-            "author": author,
-            "title": title,
-            "description": description,
-            "topic": subtema[1],
-            "difficulty": difficulty,
-            "answer": answer,
-            "hints": hints,
-            "options": JSON.parse(options)
-        }
-
-        const jsonString = JSON.stringify(jsonData);
-
-        const client = await pool.connect();
-        const result = await client.query(`CALL actualizarEjercicio($1, $2, $3, $4, $5)`, [id, autorizado, tipo, jsonString, subtema[0]]);
-        if (result.rows != null) {
-            res.status(200).json(result);
-        } else {
-            res.status(500).json({ "error": "Query no valida" });
-        }
-        client.release();
+        client = await pool.connect();
+        console.log([id, autorizado, tipo, jsonString, subtema[0]]);
+        await client.query(`CALL actualizarEjercicio($1, $2, $3, $4::json, $5)`, [id, autorizado, tipo, jsonString, subtema[0]]);   
+        res.status(201).json({message: 'OM exercise updated to database successfully'})
     } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
+        await client.query('ROLLBACK');
+        console.error('Error updating exercise to database', err);
+        res.status(500).json({ error: 'Server Internal Error' })
+    } finally {
+        client.release();
     }
 })
 
