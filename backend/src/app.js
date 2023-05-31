@@ -6,7 +6,8 @@ const logger = require('./middleware/logger');
 const pool = require('../db/index');
 const compilerRouter = require('./routes/compiler');
 const crudRouter = require('./routes/crud');
-const createGroupRouter = require('./routes/groups')
+const createGroupRouter = require('./routes/groups');
+const quizAttempRouter = require('./routes/quizAttemp');
 
 //[Dotenv Variables Initialization]
 require('dotenv').config();
@@ -41,6 +42,7 @@ app.use(express.json())
 app.use('/compiler', compilerRouter);
 app.use('/crud', crudRouter);
 app.use('/groups', createGroupRouter);
+app.use('/quizAttemp', quizAttempRouter);
 
 
 // [ROUTES]
