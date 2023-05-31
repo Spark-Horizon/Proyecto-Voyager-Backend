@@ -88,7 +88,7 @@ router.get('/filter/tipo', async (req, res) => {
     
     try {
         const client = await pool.connect();
-        const result = await client.query(`SELECT DISTINCT tipo FROM ejercicios;`);
+        const result = await client.query(`SELECT DISTINCT tipo FROM ejercicios WHERE tipo != 'Aleatorio';`);
         if (result.rows != null) {
             res.status(200).json(result.rows);
         } else {
