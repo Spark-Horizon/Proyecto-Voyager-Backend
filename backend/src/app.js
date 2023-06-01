@@ -42,7 +42,7 @@ app.use(express.json())
 app.use('/compiler', compilerRouter);
 app.use('/crud', crudRouter);
 app.use('/groups', createGroupRouter);
-app.use('/quizAttemp', quizAttempRouter);
+app.use('/quizAttempt', quizAttempRouter);
 
 
 // [ROUTES]
