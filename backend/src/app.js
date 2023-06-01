@@ -7,6 +7,7 @@ const pool = require('../db/index');
 const compilerRouter = require('./routes/compiler');
 const crudRouter = require('./routes/crud');
 const studentRouter = require('./routes/student');
+const teacherRouter = require('./routes/teacher');
 
 //[Dotenv Variables Initialization]
 require('dotenv').config();
@@ -41,6 +42,7 @@ app.use(express.json())
 app.use('/compiler', compilerRouter);
 app.use('/crud', crudRouter);
 app.use('/student', studentRouter);
+app.use('/teacher', teacherRouter);
 
 
 // [ROUTES]
