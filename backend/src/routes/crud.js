@@ -224,6 +224,33 @@ router.post('/create/om', async (req, res) => {
     }
 })
 
+router.post('/create/random', async (req, res) => {
+    const { tipo, subtema, difficulty } = req.body;
+    let client;
+
+    if (!(tipo && subtema && difficulty))
+        return res.status(400).json({ error: 'Incomplete Data' });
+
+    const jsonData = {
+        "type": tipo,
+        "difficulty": difficulty
+    }
+
+    const jsonString = JSON.stringify(jsonData);
+
+    try {
+        client = await pool.connect();
+        await client.query(`CALL agregarEjercicio($1, $2, $3::json, $4)`, [false, 'Aleatorio', jsonString, subtema[0]]);        
+        res.status(201).json({message: 'Random exercise added to database successfully'})
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Error adding exercise to database', err);
+        res.status(500).json({ error: 'Server Internal Error' })
+    } finally {
+        client.release();
+    }
+})
+
 router.put('/update/code', async (req, res) => {
     
     const { id, autorizado, tipo, subtema, author, title, description, difficulty, driver, tests } = req.body;
