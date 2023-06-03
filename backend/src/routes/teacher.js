@@ -82,6 +82,7 @@ router.delete('/activity/:id/delete', async (req, res) => {
 })
 
 router.post('/create', async (req, res) => {
+    console.log(req.body);
     const { titulo, inicio, fin, intentos, bloqueo, disponible, visible, id_grupo, ejercicios } = req.body;
     let client;
 
@@ -90,7 +91,7 @@ router.post('/create', async (req, res) => {
 
     try {
         client = await pool.connect();
-        await client.query(`agregarActividadConEjercicios($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [titulo, inicio, fin, intentos, bloqueo, disponible, visible, id_grupo, ejercicios]);        
+        await client.query(`CALL agregarActividadConEjercicios($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [titulo, inicio, fin, intentos, bloqueo, disponible, visible, id_grupo, ejercicios]);        
         res.status(201).json({message: 'Activity added to database successfully'})
     } catch (err) {
         await client.query('ROLLBACK');
@@ -102,15 +103,16 @@ router.post('/create', async (req, res) => {
 })
 
 router.put('/update', async (req, res) => {
-    const { id, titulo, inicio, fin, intentos, bloqueo, disponible, visible, id_grupo, ejercicios } = req.body;
+    const { id, titulo, inicio, fin, intentos, bloqueo, disponible, visible, ejercicios } = req.body;
 
     let client;
 
-    if (!(id && titulo && inicio && fin && intentos && id_grupo && ejercicios))
+    if (!(id && titulo && inicio && fin && intentos && ejercicios))
         return res.status(400).json({ error: 'Incomplete Data' });
     try {
         client = await pool.connect();
-        await client.query(`agregarActividadConEjercicios($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, [id, titulo, inicio, fin, intentos, bloqueo, disponible, visible, id_grupo, ejercicios]);        
+        console.log(id, titulo, inicio, fin, intentos, bloqueo, disponible, visible, ejercicios);
+        await client.query(`CALL actualizarActividadConEjercicios($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [id, titulo, inicio, fin, intentos, bloqueo, disponible, visible, ejercicios]);        
         res.status(201).json({message: 'Activity updated to database successfully'})
     } catch (err) {
         await client.query('ROLLBACK');
