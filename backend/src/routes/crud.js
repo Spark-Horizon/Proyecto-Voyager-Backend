@@ -75,6 +75,34 @@ router.get('/exercise/:id', async (req, res) => {
     }
 })
 
+router.get('/create/add/random/:tipo/:subtema/:difficulty/:id_autor', async (req, res) => {
+    let tipo = req.params.tipo;
+    let subtema = req.params.subtema.split(',');
+    let difficulty = req.params.difficulty;
+    let id_autor = req.params.id_autor;
+
+    const jsonData = {
+        "type": tipo,
+        "difficulty": difficulty
+    }   
+
+    const jsonString = JSON.stringify(jsonData);
+
+    try {
+        const client = await pool.connect();
+        const result = await client.query(`SELECT agregarIncluirEjercicio($1, $2, $3::json, $4, $5)`, [false, 'Aleatorio', jsonString, subtema[0], id_autor]);
+        if (result.rows != null) {
+            res.status(200).json(result.rows);
+        } else {
+            res.status(500).json({ "error": "Query no valida" });
+        }
+        client.release();
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+})
+
 router.get('/filter/autor', async (req, res) => {
     
     try {
