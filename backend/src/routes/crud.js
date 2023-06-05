@@ -389,15 +389,18 @@ router.put('/update/random', async (req, res) => {
         return res.status(400).json({ error: 'Incomplete Data' });
 
     const jsonData = {
+        "title": ('Ejercicio aleatorio '+ difficulty + ' de ' + tipo),
         "type": tipo,
         "difficulty": difficulty
     }
 
     const jsonString = JSON.stringify(jsonData);
 
+    console.log(jsonData);
+
     try {
         client = await pool.connect();
-        await client.query(`CALL actualizarEjercicio($1, $2, $3::json, $4, $5)`, [id, false, 'Aleatorio', jsonString, subtema[0]]);        
+        await client.query(`CALL actualizarEjercicio($1, $2, $3, $4::json, $5)`, [id, false, 'Aleatorio', jsonString, subtema[0]]);        
         res.status(201).json({message: 'Random exercise added to database successfully'})
     } catch (err) {
         await client.query('ROLLBACK');
