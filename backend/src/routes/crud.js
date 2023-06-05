@@ -82,6 +82,7 @@ router.get('/create/add/random/:tipo/:subtema/:difficulty/', async (req, res) =>
     let id_autor = req.params.id_autor;
 
     const jsonData = {
+        "title": ('Ejercicio aleatorio '+ difficulty + ' de ' + tipo),
         "type": tipo,
         "difficulty": difficulty
     }   
@@ -285,11 +286,14 @@ router.post('/create/random', async (req, res) => {
         return res.status(400).json({ error: 'Incomplete Data' });
 
     const jsonData = {
+        "title": ('Ejercicio aleatorio '+ difficulty + ' de ' + tipo),
         "type": tipo,
         "difficulty": difficulty
     }
 
     const jsonString = JSON.stringify(jsonData);
+
+    console.log(jsonData);
 
     try {
         client = await pool.connect();
