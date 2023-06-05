@@ -75,7 +75,7 @@ router.get('/exercise/:id', async (req, res) => {
     }
 })
 
-router.get('/create/add/random/:tipo/:subtema/:difficulty/:id_autor', async (req, res) => {
+router.get('/create/add/random/:tipo/:subtema/:difficulty/', async (req, res) => {
     let tipo = req.params.tipo;
     let subtema = req.params.subtema.split(',');
     let difficulty = req.params.difficulty;
@@ -90,7 +90,7 @@ router.get('/create/add/random/:tipo/:subtema/:difficulty/:id_autor', async (req
 
     try {
         const client = await pool.connect();
-        const result = await client.query(`SELECT agregarIncluirEjercicio($1, $2, $3::json, $4, $5)`, [false, 'Aleatorio', jsonString, subtema[0], id_autor]);
+        const result = await client.query(`SELECT agregarIncluirEjercicio($1, $2, $3::json, $4, $5)`, [false, 'Aleatorio', jsonString, subtema[0], null]);
         if (result.rows != null) {
             res.status(200).json(result.rows);
         } else {
