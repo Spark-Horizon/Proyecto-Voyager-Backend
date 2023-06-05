@@ -22,7 +22,7 @@ router.get('/getorset/:matricula/:subtema/:task_type', async (req, res) => {
                                 WHERE id_subtema = $2
                                 AND tipo = $3
                             )
-                            AND (correcto = false OR correcto IS NULL)
+                            AND (correcto IS NULL)
                             LIMIT 1;
                             `
 
