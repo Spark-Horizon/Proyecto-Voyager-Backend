@@ -6,6 +6,8 @@ const logger = require('./middleware/logger');
 const pool = require('../db/index');
 const compilerRouter = require('./routes/compiler');
 const crudRouter = require('./routes/crud');
+const studentRouter = require('./routes/student');
+const teacherRouter = require('./routes/teacher');
 const pathRouter = require('./routes/path');
 const usersRouter = require('./routes/users');
 
@@ -41,9 +43,10 @@ app.use(express.json())
 //[Routing Initialization]
 app.use('/compiler', compilerRouter);
 app.use('/crud', crudRouter);
+app.use('/student', studentRouter);
+app.use('/teacher', teacherRouter);
 app.use('/path', pathRouter);
 app.use('/users', usersRouter);
-
 
 // [ROUTES]
 app.get('/', (req, res) => {
