@@ -8,6 +8,12 @@ const compilerRouter = require('./routes/compiler');
 const crudRouter = require('./routes/crud');
 const createGroupRouter = require('./routes/groups');
 const quizAttempRouter = require('./routes/quizAttemp');
+const studentRouter = require('./routes/student');
+const teacherRouter = require('./routes/teacher');
+const pathRouter = require('./routes/path');
+const practicaRouter = require('./routes/practica');
+const taskRouter = require('./routes/task');
+const usersRouter = require('./routes/users');
 
 //[Dotenv Variables Initialization]
 require('dotenv').config();
@@ -43,7 +49,12 @@ app.use('/compiler', compilerRouter);
 app.use('/crud', crudRouter);
 app.use('/groups', createGroupRouter);
 app.use('/quizAttempt', quizAttempRouter);
-
+app.use('/student', studentRouter);
+app.use('/teacher', teacherRouter);
+app.use('/path', pathRouter);
+app.use('/practica', practicaRouter);
+app.use('/task', taskRouter);
+app.use('/users', usersRouter);
 
 // [ROUTES]
 app.get('/', (req, res) => {
