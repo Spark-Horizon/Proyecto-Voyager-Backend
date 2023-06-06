@@ -9,6 +9,8 @@ const crudRouter = require('./routes/crud');
 const studentRouter = require('./routes/student');
 const teacherRouter = require('./routes/teacher');
 const pathRouter = require('./routes/path');
+const practicaRouter = require('./routes/practica');
+const taskRouter = require('./routes/task');
 const usersRouter = require('./routes/users');
 
 //[Dotenv Variables Initialization]
@@ -46,6 +48,8 @@ app.use('/crud', crudRouter);
 app.use('/student', studentRouter);
 app.use('/teacher', teacherRouter);
 app.use('/path', pathRouter);
+app.use('/practica', practicaRouter);
+app.use('/task', taskRouter);
 app.use('/users', usersRouter);
 
 // [ROUTES]
