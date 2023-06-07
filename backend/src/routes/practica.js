@@ -9,49 +9,69 @@ router.get('/', (req, res) => {
 })
 
 router.get('/getorset/:matricula/:subtema/:task_type', async (req, res) => {
-    let estudiante_ID = req.params.matricula
-    let subtema_ID = req.params.subtema
-    let task_type = req.params.task_type === 'MO' ? 'Opción múltiple' : 'Código';
+    const estudiante_ID = req.params.matricula;
+    const subtema_ID = req.params.subtema;
+    const task_type = req.params.task_type === 'MO' ? 'Opción múltiple' : 'Código';
     const practicaQuery = `
-                            SELECT *
-                            FROM practicas
-                            WHERE id_estudiante = $1
-                            AND id_ejercicio IN (
-                                SELECT id
-                                FROM ejercicios
-                                WHERE id_subtema = $2
-                                AND tipo = $3
-                            )
-                            AND (correcto IS NULL)
-                            LIMIT 1;
-                            `
+      SELECT *
+      FROM practicas
+      WHERE id_estudiante = $1
+      AND id_ejercicio IN (
+        SELECT id
+        FROM ejercicios
+        WHERE id_subtema = $2
+        AND tipo = $3
+      )
+      AND (correcto IS NULL)
+      LIMIT 1;
+    `;
 
     try {
-        const client = await pool.connect()
-        const result = await client.query(practicaQuery, [estudiante_ID, subtema_ID, task_type])
+        const client = await pool.connect();
 
+        let result = await client.query(practicaQuery, [estudiante_ID, subtema_ID, task_type])
+    
         if (result.rows[0] != null) {
             res.status(200).json(result.rows)
-        } else {
-            await client.query(`
-                CALL agregarPracticaRandRuta($1, $2, $3);
-                `, [estudiante_ID, subtema_ID, task_type])
+        }else{
+            const result2 = await client.query(
+                `SELECT *
+                FROM estudiantes_subtemas
+                WHERE id_estudiante = $1
+                AND id_subtema = $2`,
+                [estudiante_ID, subtema_ID]
+            );
+            const passedSubtem = result2.rows[0].superado;
 
-            const result = await client.query(practicaQuery, [estudiante_ID, subtema_ID, task_type])
-            
-            console.log(result.rows[0])
-
-            if (result.rows[0] != null) {
-                res.status(200).json(result.rows)
+            if (passedSubtem) {
+                await client.query(`CALL agregarPracticaRandLibre($1, $2, $3);`, [
+                    estudiante_ID,
+                    subtema_ID,
+                    task_type,
+                ]);
             } else {
-                res.status(500).json({ "error": "Matriculo y/o subtema no validos" })
+                await client.query(`CALL agregarPracticaRandRuta($1, $2, $3);`, [
+                    estudiante_ID,
+                    subtema_ID,
+                    task_type,
+                ]);
             }
+            result = await client.query(practicaQuery, [estudiante_ID, subtema_ID, task_type]);
         }
-        client.release()
-    } catch (err) {
-        console.log(err)
-        res.status(500).send(err)
+
+        if (result.rows[0] != null) {
+            res.status(200).json(result.rows);
+        } else {
+            res.status(500).json({ error: 'Matriculo y/o subtema no validos' });
+        }
+
+        client.release();
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
     }
-})
+});
+
 
 module.exports = router;
