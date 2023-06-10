@@ -31,9 +31,7 @@ router.get('/getorset/:matricula/:subtema/:task_type', async (req, res) => {
 
         let result = await client.query(practicaQuery, [estudiante_ID, subtema_ID, task_type])
     
-        if (result.rows[0] != null) {
-            res.status(200).json(result.rows)
-        }else{
+        if (result.rows[0] == null) {
             const result2 = await client.query(
                 `SELECT *
                 FROM estudiantes_subtemas
@@ -58,7 +56,7 @@ router.get('/getorset/:matricula/:subtema/:task_type', async (req, res) => {
             }
             result = await client.query(practicaQuery, [estudiante_ID, subtema_ID, task_type]);
         }
-
+        
         if (result.rows[0] != null) {
             res.status(200).json(result.rows);
         } else {
