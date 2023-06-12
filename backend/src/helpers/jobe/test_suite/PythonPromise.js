@@ -150,10 +150,13 @@ class PythonPromiseNoDriver extends PythonPromise {
             } else {
                 parsedInput = String(inputTest);
             }
-    
-            this._runSpec['run_spec']['input'] = parsedInput;
+            
+            // Log the parsedInput
+            console.log(`Parsed input: ${parsedInput}`);
+
+            this._runSpec['run_spec']['input'] = parsedInput + '\n'; // Add a new line to the end of input
             this._options['data'] = JSON.stringify(this._runSpec);
-    
+
             this._promises.push(axios(this._options));
         });
     }
@@ -171,20 +174,23 @@ class PythonPromiseNoDriver extends PythonPromise {
 
     getTestsInfo(responses, tests) {
         return responses.map((response, i) => {
-          const stdout = response.data.stdout.replace(/\n$/, ''); // Realiza el reemplazo en la misma línea
-          const { output } = tests[i];
+            const stdout = response.data.stdout.replace(/\n$/, ''); // Realiza el reemplazo en la misma línea
+            const { output } = tests[i];
+        
+            // Log the stdout and output
+            console.log(`Standard output: ${stdout}`);
+            console.log(`Expected output: ${output}`);
+
+            const passed = stdout === String(output); //We use 
       
-          const passed = stdout == output; //We use 
-          console.log(`Actual output: ${stdout}, Expected output: ${output}`);
-      
-          return {
-            index: i,
-            passed,
-            expectedOutput: output,
-            actualOutput: stdout
-          };
+            return {
+                index: i,
+                passed,
+                expectedOutput: output,
+                actualOutput: stdout
+            };
         });
-      }
+    }
       
 
     get getPromiseArray() {
