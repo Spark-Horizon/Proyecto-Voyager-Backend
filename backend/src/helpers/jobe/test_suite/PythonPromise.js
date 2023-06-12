@@ -201,10 +201,7 @@ class PythonPromiseNoDriver extends PythonPromise {
             } else {
                 parsedInput = String(inputTest);
             }
-            
-            // Log the parsedInput
-            console.log(`Parsed input: ${parsedInput}`);
-
+    
             this._runSpec['run_spec']['input'] = parsedInput + '\n'; // Add a new line to the end of input
             this._options['data'] = JSON.stringify(this._runSpec);
 
