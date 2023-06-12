@@ -48,7 +48,7 @@ router.get('/problem/:id_problem', async (req, res) => {
 
 router.post('/problem/run', async (req, res) => {
     // console.log(req.body);
-    if (!req.body || Object.keys(req.body).length === 0) { 
+    if (!req.body || Object.keys(req.body).length === 0) {
         return res.status(300).send('Body data is undefined');
     }
 
@@ -67,7 +67,7 @@ router.post('/problem/run', async (req, res) => {
         try {
             /* PYTHON CODE WITH DRIVER
                 When driver's name is given, a test suite will be generated. This test suite uses the standard error output so the code can be easily pruned.
-            */ 
+            */
             const response = await pythonPromise.getPromise;
             const { cmpinfo, stdout, stderr } = response.data;
             // console.log({"Compiler Info:": cmpinfo, "Standard Output:": stdout, "Standard Error:": stderr});
@@ -88,32 +88,28 @@ router.post('/problem/run', async (req, res) => {
         pythonPromise = promiseFactory.createPromise(null, tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
         pythonPromise.defineInputs();
         try {
-            //Array to store the final results
-            const results = [];
-            // console.log(pythonPromise.getPromiseArray);
             const responses = await Promise.all(pythonPromise.getPromiseArray);
-            //Array to store the testsInfo
-            const testsInfo = pythonPromise.getTestsInfo(responses, tests);
-            // console.log(`responses are: ${JSON.stringify(responses[0].data['stdout'])}`);
-            // console.log(`responses are: ${JSON.stringify(responses[0].data)}`);
-            // console.log(responses[0].data);
-            // console.log(responses[1].data);
-            // console.log(responses[2].data);
+            const results = {
+                cmpinfo: '',
+                stdout: '',
+                stderr: ''
+            };
 
             for (const response of responses) {
-                let { cmpinfo, stdout, stderr } = response.data;
-                // console.log({cmpinfo, stdout, stderr});
-                results.push({cmpinfo, stdout, stderr});
+                const { cmpinfo, stdout, stderr } = response.data;
+                results.cmpinfo += cmpinfo  || '';
+                results.stdout += stdout || '';
+                results.stderr += stderr || '';
             }
 
-            res.send(
-                {
-                    results,
-                    testsInfo
-                }
-            );
+            const testsInfo = pythonPromise.getTestsInfo(responses, tests);
+
+            res.send({
+                ...results,
+                testsInfo
+            });
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
