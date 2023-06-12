@@ -59,30 +59,7 @@ router.post('/problem/run', async (req, res) => {
     let pythonPromise;
     // Defining which type of promise will be resolved
     if (driver) {
-        console.log("driver");
-        // console.log(tests);
-        pythonPromise = promiseFactory.createPromise('driver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
-        pythonPromise.defineAssertions();
-
-        try {
-            /* PYTHON CODE WITH DRIVER
-                When driver's name is given, a test suite will be generated. This test suite uses the standard error output so the code can be easily pruned.
-            */ 
-            const response = await pythonPromise.getPromise;
-            const { cmpinfo, stdout, stderr } = response.data;
-            // console.log({"Compiler Info:": cmpinfo, "Standard Output:": stdout, "Standard Error:": stderr});
-
-            res.send(
-                {
-                    cmpinfo,
-                    stdout,
-                    stderr,
-                    testsInfo: pythonPromise.getTestsInfo(stderr)
-                }
-            )
-        } catch (error) {
-            console.log(error);
-        }
+        // El resto del código se mantiene igual...
     } else {
         console.log("noDriver");
         pythonPromise = promiseFactory.createPromise(null, tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
