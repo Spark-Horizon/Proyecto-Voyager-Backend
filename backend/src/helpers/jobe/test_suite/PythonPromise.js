@@ -143,35 +143,45 @@ class PythonPromiseNoDriver extends PythonPromise {
     }
 
     defineInputs() {
-        this._tests.forEach(({input:inputTest}) => {
-            const parsedInput = inputTest.replace(/,/g, '\n');
-            // console.log(`input test ${inputTest}`);
-            // console.log(`parsed input ${parsedInput}`);
-
+        this._tests.forEach(({input: inputTest}) => {
+            let parsedInput;
+            if (Array.isArray(inputTest)) {
+                parsedInput = this.recursiveJoin(inputTest, '\n');
+            } else {
+                parsedInput = String(inputTest);
+            }
+    
             this._runSpec['run_spec']['input'] = parsedInput;
             this._options['data'] = JSON.stringify(this._runSpec);
-
-            // console.log(`
-            // options ${JSON.stringify(this._options)}
-            // `); //Petitions that are sent to the API
-
+    
             this._promises.push(axios(this._options));
         });
     }
+    
+    recursiveJoin(inputArray, separator) {
+        return inputArray.map(item => {
+            if (Array.isArray(item)) {
+                return this.recursiveJoin(item, separator);
+            } else {
+                return String(item);
+            }
+        }).join(separator);
+    }
+    
 
     getTestsInfo(responses, tests) {
         return responses.map((response, i) => {
           const stdout = response.data.stdout.replace(/\n$/, ''); // Realiza el reemplazo en la misma línea
           const { output } = tests[i];
       
-          const passed = stdout === output;
+          const passed = stdout == output; //We use 
           console.log(`Actual output: ${stdout}, Expected output: ${output}`);
       
           return {
             index: i,
             passed,
-            expectedOutput: passed ? null : output,
-            actualOutput: passed ? null : stdout,
+            expectedOutput: output,
+            actualOutput: stdout
           };
         });
       }
@@ -188,7 +198,7 @@ class PythonPromiseFactory {
             case 'driver':
                 return new PythonPromiseDriver(tests, driver, url, method, code);
         
-            case 'noDriver':
+            case null:
                 return new PythonPromiseNoDriver(tests, driver, url, method, code);
 
             default:

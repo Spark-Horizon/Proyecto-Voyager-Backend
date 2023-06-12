@@ -58,7 +58,7 @@ router.post('/problem/run', async (req, res) => {
     let promiseFactory = new PythonPromiseFactory()
     let pythonPromise;
     // Defining which type of promise will be resolved
-    if (driver !== '') {
+    if (driver) {
         console.log("driver");
         // console.log(tests);
         pythonPromise = promiseFactory.createPromise('driver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
@@ -85,7 +85,7 @@ router.post('/problem/run', async (req, res) => {
         }
     } else {
         console.log("noDriver");
-        pythonPromise = promiseFactory.createPromise('noDriver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
+        pythonPromise = promiseFactory.createPromise(null, tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
         pythonPromise.defineInputs();
         try {
             //Array to store the final results

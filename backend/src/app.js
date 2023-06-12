@@ -14,6 +14,7 @@ const pathRouter = require('./routes/path');
 const practicaRouter = require('./routes/practica');
 const taskRouter = require('./routes/task');
 const usersRouter = require('./routes/users');
+const quizStudentRouter = require('./routes/quizStudent');
 
 //[Dotenv Variables Initialization]
 require('dotenv').config();
@@ -55,6 +56,7 @@ app.use('/path', pathRouter);
 app.use('/practica', practicaRouter);
 app.use('/task', taskRouter);
 app.use('/users', usersRouter);
+app.use('/quizStudent', quizStudentRouter);
 
 // [ROUTES]
 app.get('/', (req, res) => {
