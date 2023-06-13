@@ -40,6 +40,7 @@ router.get('/:role/:id', async (req, res, next) => {
   try {
     const client = await pool.connect();
     const result = await client.query(query, [id]);
+    client.release();
     res.status(200).json(result.rows);
   } catch (error) {
     console.error(error);

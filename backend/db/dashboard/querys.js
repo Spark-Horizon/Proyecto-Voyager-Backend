@@ -29,20 +29,19 @@ GROUP BY t3.nombre;
 `;
 
 // Utiliza la variable 'query' en tu programa para ejecutar la consulta en PostgreSQL.
-
-
 const retrieveData = async (queryValues, query, res) => {
     try {
         const values = queryValues;
         const client = await pool.connect();
         const result = await client.query(query, values);
         if (result.rows != null) {
+            client.release();
             res.status(200).json(result.rows);
+            console.table(result.rows)
         } else {
+            client.release();
             res.status(500).json({ "error": "Query no valida" });
         }
-        console.table(result.rows)
-        client.release();
     } catch (error) {
         console.log(error);
     }
