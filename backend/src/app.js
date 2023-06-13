@@ -65,9 +65,10 @@ app.get('/', (req, res) => {
   res.send('Hello world :)');
 });
 
-//Inicia el servidor solo si este archivo es el punto de entrada principal
-app.listen(3001, '0.0.0.0', () => { // Change this in production [IMPORTANT]
-  console.log(`Servidor iniciado en el puerto 3001`);
-});
+  const PORT = process.env.PORT
+  console.log('A punto de iniciar el servidor en el puerto 3001 que en local es 9050 y la API se comunica a: ', PORT);
+  app.listen(3001, '0.0.0.0', () => { // Change this in production [IMPORTANT]
+    console.log(`Servidor iniciado en el puerto 3000`);
+  });
 
 module.exports = app;
