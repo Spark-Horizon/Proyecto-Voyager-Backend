@@ -39,21 +39,44 @@ class PythonPromiseDriver extends PythonPromise {
 
     defineAssertions() {
         let assertions = '';
-
-        this._tests.forEach(({input, output}) => {
+    
+        this._tests.forEach(({ input, output }) => {
             this._inputs.push(input);
             this._outputs.push(output);
-        })
-
+        });
+    
         // Creating assertions
-        for (let i = 0; i < this._tests.length; i++){
+        for (let i = 0; i < this._tests.length; i++) {
+            const formattedInput = JSON.stringify(this._inputs[i]);
+            const formattedOutput = JSON.stringify(this._outputs[i]);
+    
             assertions += `    def test_case_${i}(self):\n`;
-            assertions += `        actual_output_${i} = ${this._driver}(${this._inputs[i]})\n`;
-            assertions += `        self.assertEqual(actual_output_${i}, ${this._outputs[i]}, "actual_output_${i}=" + str(actual_output_${i}))\n\n`;
-        }        
-
+            assertions += `        actual_output_${i} = ${this._driver}(${formattedInput})\n`;
+            assertions += `        expected_output_${i} = ${formattedOutput}\n`;
+            assertions += `        self.assertEqual(actual_output_${i}, expected_output_${i}, "actual_output_${i}=" + str(actual_output_${i}))\n\n`;
+        }
+    
         this._sourceCode['assertions'] = assertions;
     }
+    
+    
+    formatInput(input) {
+        if (typeof input === 'string') {
+            console.log(`"${input}"`);
+            return `"${input}"`;
+        } else if (typeof input === 'number' || typeof input === 'boolean' || input === null) {
+            return JSON.stringify(input);
+        } else if (Array.isArray(input)) {
+            return `[${input.map(item => this.formatInput(item)).join(', ')}]`;
+        } else if (typeof input === 'object') {
+            const formattedProperties = Object.entries(input).map(([key, value]) => `"${key}": ${this.formatInput(value)}`);
+            return `{${formattedProperties.join(', ')}}`;
+        } else {
+            // Handle other data types as needed
+            return JSON.stringify(input);
+        }
+    }
+    
 
     getTestsInfo(errString) {
         // console.log('ERRORES', errString);

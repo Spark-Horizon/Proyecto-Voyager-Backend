@@ -6,6 +6,7 @@ const logger = require('./middleware/logger');
 const pool = require('../db/index');
 const compilerRouter = require('./routes/compiler');
 const crudRouter = require('./routes/crud');
+const dashboardRouter = require('./routes/dashboard');
 
 //[Dotenv Variables Initialization]
 require('dotenv').config();
@@ -39,6 +40,7 @@ app.use(express.json())
 //[Routing Initialization]
 app.use('/compiler', compilerRouter);
 app.use('/crud', crudRouter);
+app.use('/dashboard', dashboardRouter);
 
 
 // [ROUTES]
@@ -48,7 +50,7 @@ app.get('/', (req, res) => {
 
 //Inicia el servidor solo si este archivo es el punto de entrada principal
 if (require.main === module) {
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 3001;
   app.listen(PORT, '0.0.0.0', () => { // Change this in production [IMPORTANT]
     console.log(`Servidor iniciado en el puerto ${PORT}`);
   });
