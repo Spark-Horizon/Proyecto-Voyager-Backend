@@ -104,6 +104,109 @@ router.get('/create/add/random/:tipo/:subtema/:difficulty/', async (req, res) =>
     }
 })
 
+router.post('/update/add/code', async (req, res) => {
+    const { id, autorizado, tipo, subtema, author, title, description, difficulty, driver, tests } = req.body;
+    let client;
+
+    if (!(id &&tipo && subtema && author && title && description && difficulty && driver && tests))
+        return res.status(400).json({ error: 'Incomplete Data' });
+
+    const jsonData = {
+        "author": author,
+        "title": title,
+        "description": description,
+        "topic": subtema[1],
+        "difficulty": difficulty,
+        "driver": driver,
+        "tests": JSON.parse(tests)
+    }
+
+    console.log(jsonData);
+
+    const jsonString = JSON.stringify(jsonData);
+
+    try {
+        client = await pool.connect();
+        console.log([autorizado, tipo, jsonString, subtema[0]]);
+        const result = await client.query(`SELECT actualizarIncluirEjercicio($1, $2, $3, $4::json, $5)`, [id, autorizado, tipo, jsonString, subtema[0]]);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Error adding exercise to database', err);
+        res.status(500).json({ error: 'Server Internal Error' })
+    } finally {
+        client.release();
+    }    
+})
+
+router.post('/update/add/om', async (req, res) => {
+    const { id, autorizado, tipo, subtema, author, title, description, difficulty, answer, hints, options } = req.body;
+    let client;
+
+    if (!(id && tipo && subtema && author && title && description && difficulty && answer && options)){
+        return res.status(400).json({ error: 'Incomplete Data' });
+    }
+
+    const jsonData = {
+        "author": author,
+        "title": title,
+        "description": description,
+        "topic": subtema[1],
+        "difficulty": difficulty,
+        "answer": answer,
+        "hints": hints,
+        "options": JSON.parse(options)
+    }
+
+    console.log(jsonData);
+
+    const jsonString = JSON.stringify(jsonData);
+
+    try {
+        client = await pool.connect();
+        console.log([id, autorizado, tipo, jsonString, subtema[0]]);
+        const result = await client.query(`SELECT actualizarIncluirEjercicio($1, $2, $3, $4::json, $5)`, [id, autorizado, tipo, jsonString, subtema[0]]);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Error updating exercise to database', err);
+        res.status(500).json({ error: 'Server Internal Error' })
+    } finally {
+        client.release();
+    }
+})
+
+router.post('/update/add/random', async (req, res) => {
+    console.log(req.body);
+    const { id, tipo, subtema, difficulty } = req.body;
+    let client;
+
+    if (!(id && tipo && subtema && difficulty))
+        return res.status(400).json({ error: 'Incomplete Data' });
+
+    const jsonData = {
+        "title": ('Ejercicio aleatorio '+ difficulty + ' de ' + tipo),
+        "type": tipo,
+        "difficulty": difficulty
+    }
+
+    const jsonString = JSON.stringify(jsonData);
+
+    console.log(jsonData);
+
+    try {
+        client = await pool.connect();
+        const result = await client.query(`SELECT actualizarIncluirEjercicio($1, $2, $3, $4::json, $5)`, [id, false, 'Aleatorio', jsonString, subtema[0]]);        
+        res.status(200).json(result.rows);
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Error adding exercise to database', err);
+        res.status(500).json({ error: 'Server Internal Error' })
+    } finally {
+        client.release();
+    }
+})
+
 router.get('/filter/autor', async (req, res) => {
     
     try {
