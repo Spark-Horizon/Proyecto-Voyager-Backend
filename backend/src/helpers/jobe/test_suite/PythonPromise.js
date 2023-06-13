@@ -30,29 +30,80 @@ class PythonPromiseDriver extends PythonPromise {
         super(_tests, _driver, _url, _method);
         this._sourceCode = {
             imports: 'import unittest\nimport sys\n',
-            code: code,
+            code: this.normalizeIndentation(code, 4),
             classDefinition: '\nclass TestMyFunctions(unittest.TestCase):\n',
             assertions: null,
             main: "if __name__ == '__main__':\n    loader = unittest.TestLoader()\n    suite = loader.loadTestsFromModule(sys.modules[__name__])\n    runner = unittest.TextTestRunner(verbosity=2)\n    result = runner.run(suite)"
         }
     }
+    normalizeIndentation(code, spacesPerIndentation) {
+        const lines = code.split('\n');
+        let normalizedCode = '';
+      
+        for (const line of lines) {
+          let indentLevel = 0;
+          let indentChars = '';
+      
+          for (const char of line) {
+            if (char === ' ' || char === '\t') {
+              indentChars += char;
+              if (indentChars.length === spacesPerIndentation || char === '\t') {
+                indentChars = '';
+                indentLevel++;
+              }
+            } else {
+              break;
+            }
+          }
+      
+          const normalizedLine = '\t'.repeat(indentLevel) + line.trim();
+          normalizedCode += normalizedLine + '\n';
+        }
+      
+        return normalizedCode.trim();
+    }
+      
+      
+      
 
     defineAssertions() {
         let assertions = '';
-
-        this._tests.forEach(({input, output}) => {
+    
+        this._tests.forEach(({ input, output }) => {
             this._inputs.push(input);
             this._outputs.push(output);
-        })
-
+        });
+    
         // Creating assertions
-        for (let i = 0; i < this._tests.length; i++){
+        for (let i = 0; i < this._tests.length; i++) {
+            const formattedInput = JSON.stringify(this._inputs[i]);
+            const formattedOutput = JSON.stringify(this._outputs[i]);
+    
             assertions += `    def test_case_${i}(self):\n`;
-            assertions += `        actual_output_${i} = ${this._driver}(${this._inputs[i]})\n`;
-            assertions += `        self.assertEqual(actual_output_${i}, ${this._outputs[i]}, "actual_output_${i}=" + str(actual_output_${i}))\n\n`;
-        }        
-
+            assertions += `        actual_output_${i} = ${this._driver}(${formattedInput})\n`;
+            assertions += `        expected_output_${i} = ${formattedOutput}\n`;
+            assertions += `        self.assertEqual(actual_output_${i}, expected_output_${i}, "actual_output_${i}=" + str(actual_output_${i}))\n\n`;
+        }
+    
         this._sourceCode['assertions'] = assertions;
+    }
+    
+    
+    formatInput(input) {
+        if (typeof input === 'string') {
+            console.log(`"${input}"`);
+            return `"${input}"`;
+        } else if (typeof input === 'number' || typeof input === 'boolean' || input === null) {
+            return JSON.stringify(input);
+        } else if (Array.isArray(input)) {
+            return `[${input.map(item => this.formatInput(item)).join(', ')}]`;
+        } else if (typeof input === 'object') {
+            const formattedProperties = Object.entries(input).map(([key, value]) => `"${key}": ${this.formatInput(value)}`);
+            return `{${formattedProperties.join(', ')}}`;
+        } else {
+            // Handle other data types as needed
+            return JSON.stringify(input);
+        }
     }
 
     getTestsInfo(errString) {
@@ -143,38 +194,51 @@ class PythonPromiseNoDriver extends PythonPromise {
     }
 
     defineInputs() {
-        this._tests.forEach(({input:inputTest}) => {
-            const parsedInput = inputTest.replace(/,/g, '\n');
-            // console.log(`input test ${inputTest}`);
-            // console.log(`parsed input ${parsedInput}`);
-
-            this._runSpec['run_spec']['input'] = parsedInput;
+        this._tests.forEach(({input: inputTest}) => {
+            let parsedInput;
+            if (Array.isArray(inputTest)) {
+                parsedInput = this.recursiveJoin(inputTest, '\n');
+            } else {
+                parsedInput = String(inputTest);
+            }
+    
+            this._runSpec['run_spec']['input'] = parsedInput + '\n'; // Add a new line to the end of input
             this._options['data'] = JSON.stringify(this._runSpec);
-
-            // console.log(`
-            // options ${JSON.stringify(this._options)}
-            // `); //Petitions that are sent to the API
 
             this._promises.push(axios(this._options));
         });
     }
+    
+    recursiveJoin(inputArray, separator) {
+        return inputArray.map(item => {
+            if (Array.isArray(item)) {
+                return this.recursiveJoin(item, separator);
+            } else {
+                return String(item);
+            }
+        }).join(separator);
+    }
+    
 
     getTestsInfo(responses, tests) {
         return responses.map((response, i) => {
-          const stdout = response.data.stdout.replace(/\n$/, ''); // Realiza el reemplazo en la misma línea
-          const { output } = tests[i];
+            const stdout = response.data.stdout.replace(/\n$/, ''); // Realiza el reemplazo en la misma línea
+            const { output } = tests[i];
+        
+            // Log the stdout and output
+            console.log(`Standard output: ${stdout}`);
+            console.log(`Expected output: ${output}`);
+
+            const passed = stdout === String(output); //We use 
       
-          const passed = stdout === output;
-          console.log(`Actual output: ${stdout}, Expected output: ${output}`);
-      
-          return {
-            index: i,
-            passed,
-            expectedOutput: passed ? null : output,
-            actualOutput: passed ? null : stdout,
-          };
+            return {
+                index: i,
+                passed,
+                expectedOutput: output,
+                actualOutput: stdout
+            };
         });
-      }
+    }
       
 
     get getPromiseArray() {
@@ -188,7 +252,7 @@ class PythonPromiseFactory {
             case 'driver':
                 return new PythonPromiseDriver(tests, driver, url, method, code);
         
-            case 'noDriver':
+            case null:
                 return new PythonPromiseNoDriver(tests, driver, url, method, code);
 
             default:
