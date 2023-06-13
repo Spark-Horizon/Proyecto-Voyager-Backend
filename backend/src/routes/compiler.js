@@ -6,6 +6,8 @@ const { PythonPromiseFactory } = require('../helpers/jobe/test_suite/PythonPromi
 const router = express.Router();
 
 const IP_SERVER = process.env.IP;
+const JOBE_PORT = process.env.PORT;
+
 console.log(IP_SERVER)
 const pool = require('../../db/index');
 
@@ -61,7 +63,7 @@ router.post('/problem/run', async (req, res) => {
     if (driver) {
         console.log("driver");
         // console.log(tests);
-        pythonPromise = promiseFactory.createPromise('driver', tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
+        pythonPromise = promiseFactory.createPromise('driver', tests, driver, `http://${IP_SERVER}:${JOBE_PORT}/jobe/index.php/restapi/runs/`, 'POST', code)
         pythonPromise.defineAssertions();
 
         try {
@@ -85,7 +87,7 @@ router.post('/problem/run', async (req, res) => {
         }
     } else {
         console.log("noDriver");
-        pythonPromise = promiseFactory.createPromise(null, tests, driver, `http://${IP_SERVER}/jobe/index.php/restapi/runs/`, 'POST', code)
+        pythonPromise = promiseFactory.createPromise(null, tests, driver, `http://${IP_SERVER}:${JOBE_PORT}/jobe/index.php/restapi/runs/`, 'POST', code)
         pythonPromise.defineInputs();
         try {
             const responses = await Promise.all(pythonPromise.getPromiseArray);
