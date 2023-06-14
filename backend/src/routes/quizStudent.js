@@ -5,23 +5,22 @@ const router = express.Router();
 const pool = require('../../db/index');
 
 //GET QUERYS
-const GET_EXERCISES_QUERY = `SELECT ejercicios.id, ejercicios.tipo
-FROM ejercicios
-INNER JOIN actividades_ejercicios
-ON ejercicios.id = actividades_ejercicios.id_ejercicio
-WHERE actividades_ejercicios.id_actividad = $1`;
+const GET_ATTEMPT_EXERCISES_QUERY = `SELECT respuestas.id, respuestas.id_ejercicio, ejercicios.tipo
+FROM respuestas
+INNER JOIN ejercicios ON respuestas.id_ejercicio = ejercicios.id
+WHERE respuestas.id_intento = $1`;
 
 //POST QUERYS
 
 //DELETE QUERYS
 
 //Get exercises id and type from an activity
-router.get('/:id_activity', async (req, res) => {
-    const params = [req.params.id_activity];
+router.get('/:id_intento', async (req, res) => {
+    const params = [req.params.id_intento];
     let client;
     try{
         client = await pool.connect();
-        const result = await client.query(GET_EXERCISES_QUERY,params);
+        const result = await client.query(GET_ATTEMPT_EXERCISES_QUERY,params);
         res.status(200).json(result.rows);
     }catch (error){
         console.error(error);
