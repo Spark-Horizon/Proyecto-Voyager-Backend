@@ -5,7 +5,7 @@ const router = express.Router();
 const pool = require('../../db/index');
 
 //GET QUERYS
-const GET_ATTEMPT_EXERCISES_QUERY = `SELECT respuestas.id, respuestas.id_ejercicio, ejercicios.tipo
+const GET_ATTEMPT_EXERCISES_QUERY = `SELECT respuestas.id as id_respuesta, respuestas.id_ejercicio as id, ejercicios.tipo
 FROM respuestas
 INNER JOIN ejercicios ON respuestas.id_ejercicio = ejercicios.id
 WHERE respuestas.id_intento = $1`;
