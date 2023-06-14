@@ -73,4 +73,28 @@ router.get('/getorset/:matricula/:quiz', async (req, res) => {
     }
 });
 
+router.post('/submitRespuesta/', async (req, res) => {
+    const { id_respuesta, answer } = req.body
+    console.log(answer);
+    let correct = answer.correcto
+
+    try {
+        const client = await pool.connect() 
+        const [result1, result2] = Promise.all([
+            client.query(`CALL actualizarRespuesta($1, $2); `, [id_respuesta, answer]),
+            client.query(`CALL actualizarRespuestaCorrecta($1, $2); `, [id_respuesta, correct])
+        ]);
+        if (result1.rows != null || result2.rows != null) {
+            res.status(200).json(result1, result2);
+        } else {
+            res.status(500).json({ "error": "Query no valida" });
+        }
+        client.release();
+    } catch (error) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+
+})
+
 module.exports = router;
