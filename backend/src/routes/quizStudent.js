@@ -96,5 +96,26 @@ router.post('/submitRespuesta/', async (req, res) => {
     }
 });
 
+router.post('/submitIntento/', async (req, res) => {
+    try {
+        const { id_intento } = req.body;
+
+        const client = await pool.connect();
+        const query = `CALL entregarIntento($1);`;
+        const result = client.query(query, [id_intento])
+
+        if (result.rows != null) {
+            res.status(200).json(result);
+        } else {
+            res.status(500).json({ "error": "Query no valida" });
+        }
+
+        client.release();
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+});
+
 
 module.exports = router;
