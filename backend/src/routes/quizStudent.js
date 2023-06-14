@@ -74,27 +74,27 @@ router.get('/getorset/:matricula/:quiz', async (req, res) => {
 });
 
 router.post('/submitRespuesta/', async (req, res) => {
-    const { id_respuesta, answer } = req.body
-    console.log(answer);
-    let correct = answer.correcto
-
     try {
-        const client = await pool.connect() 
-        const [result1, result2] = Promise.all([
-            client.query(`CALL actualizarRespuesta($1, $2); `, [id_respuesta, answer]),
-            client.query(`CALL actualizarRespuestaCorrecta($1, $2); `, [id_respuesta, correct])
+        const { id_respuesta, answer } = req.body;
+        const answerJSON = JSON.parse(answer);
+        const correct = answerJSON.correcto;
+
+        const client = await pool.connect();
+        const query1 = `CALL actualizarRespuesta($1, $2);`;
+        const query2 = `CALL actualizarRespuestaCorrecta($1, $2);`;
+
+        await Promise.all([
+            client.query(query1, [id_respuesta, answer]),
+            client.query(query2, [id_respuesta, correct])
         ]);
-        if (result1.rows != null || result2.rows != null) {
-            res.status(200).json(result1, result2);
-        } else {
-            res.status(500).json({ "error": "Query no valida" });
-        }
+
+        res.status(200).json({ success: true });
         client.release();
     } catch (error) {
-        console.log(err);
-        res.status(500).send(err);
+        console.log(error);
+        res.status(500).json({ error: "Error interno del servidor" });
     }
+});
 
-})
 
 module.exports = router;
