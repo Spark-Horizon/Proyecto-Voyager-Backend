@@ -16,6 +16,62 @@ WHERE intentos.id = $1;
 
 //DELETE QUERYS
 
+router.get('/getorset/:matricula/:quiz', async (req, res) => {
+    const estudiante_ID = req.params.matricula;
+    const quizz_ID = req.params.quiz;
+
+    const intentoQuery = `
+        SELECT *
+        FROM intentos
+        WHERE id_estudiante = $1
+        AND id_actividad = $2
+        AND fin IS NULL
+    `;
+
+    let client;
+
+    try {
+        client = await pool.connect();
+
+        let result = await client.query(intentoQuery, [estudiante_ID, quizz_ID]);
+        let intentoId;
+        
+        if (result.rows.length === 0) {
+            await client.query(`CALL agregarIntento($1, $2);`, [
+                estudiante_ID,
+                quizz_ID
+            ]);
+            
+            // Después de crear un nuevo intento, vuelve a consultar para obtenerlo
+            result = await client.query(intentoQuery, [estudiante_ID, quizz_ID]);
+        }
+        
+        intentoId = result.rows[1].id; //Esto lo tengo que cambiar por la función de Omar, además de borrar el intento 4 porque interfiere con el 21
+        console.log('IntentoId', result.rows);
+
+        // Aquí llamas a GET_ID_ANSWER_AND_FILE independientemente de si el intento existía o se acaba de crear
+        console.log('Antes de llamar a la master')
+        const resultGet = await client.query(GET_ID_ANSWER_AND_FILE, [intentoId]);
+        console.log('ResultGet: ', resultGet.rows)
+
+        if (result.rows.length > 0) {
+            res.status(200).json({
+                attempt: result.rows,
+                answers: resultGet.rows
+            });
+        } else {
+            res.status(500).json({ error: 'Matricula y/o quiz no válidos o no se pudo crear un intento.' });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'Se produjo un error en el servidor.' });
+    } finally {
+        client.release();
+    }
+});
+
+
 //Get id_answer id and file from the activity/quiz
 //useFetchQuizStudent
 router.get('/:id_intento', async (req, res) => {
@@ -33,58 +89,58 @@ router.get('/:id_intento', async (req, res) => {
     }
 });
 
-// Endpoint para obtener o establecer un intento de quiz para un estudiante
-router.get('/getorset/:matricula/:quiz', async (req, res) => {
-    // Obtén los parámetros de la ruta
-    const estudiante_ID = req.params.matricula;
-    const quizz_ID = req.params.quiz;
+// // Endpoint para obtener o establecer un intento de quiz para un estudiante
+// router.get('/getorset/:matricula/:quiz', async (req, res) => {
+//     // Obtén los parámetros de la ruta
+//     const estudiante_ID = req.params.matricula;
+//     const quizz_ID = req.params.quiz;
 
-    // Siempre es bueno validar las entradas
-    // Agrega aquí la validación para estudiante_ID y quizz_ID, si es necesario
+//     // Siempre es bueno validar las entradas
+//     // Agrega aquí la validación para estudiante_ID y quizz_ID, si es necesario
 
-    // Consulta para buscar intentos existentes sin completar
-    const intentoQuery = `
-        SELECT *
-        FROM intentos
-        WHERE id_estudiante = $1
-        AND id_actividad = $2
-        AND fin IS NULL
-    `;
+//     // Consulta para buscar intentos existentes sin completar
+//     const intentoQuery = `
+//         SELECT *
+//         FROM intentos
+//         WHERE id_estudiante = $1
+//         AND id_actividad = $2
+//         AND fin IS NULL
+//     `;
 
-    let client;
+//     let client;
 
-    try {
-        client = await pool.connect();
+//     try {
+//         client = await pool.connect();
 
-        // Intenta obtener un intento existente sin completar
-        let result = await client.query(intentoQuery, [estudiante_ID, quizz_ID]);
+//         // Intenta obtener un intento existente sin completar
+//         let result = await client.query(intentoQuery, [estudiante_ID, quizz_ID]);
 
-        // Si no existe un intento, crea uno nuevo
-        if (result.rows.length === 0) {
-            await client.query(`CALL agregarIntento($1, $2);`, [
-                estudiante_ID,
-                quizz_ID
-            ]);
+//         // Si no existe un intento, crea uno nuevo
+//         if (result.rows.length === 0) {
+//             await client.query(`CALL agregarIntento($1, $2);`, [
+//                 estudiante_ID,
+//                 quizz_ID
+//             ]);
 
-            // Después de crear un nuevo intento, vuelve a consultar para obtenerlo
-            result = await client.query(intentoQuery, [estudiante_ID, quizz_ID]);
-        }
+//             // Después de crear un nuevo intento, vuelve a consultar para obtenerlo
+//             result = await client.query(intentoQuery, [estudiante_ID, quizz_ID]);
+//         }
 
-        // Si la consulta devuelve un resultado, responde con éxito, de lo contrario devuelve un error
-        if (result.rows.length > 0) {
-            res.status(200).json(result.rows);
-        } else {
-            res.status(500).json({ error: 'Matricula y/o quiz no válidos o no se pudo crear un intento.' });
-        }
+//         // Si la consulta devuelve un resultado, responde con éxito, de lo contrario devuelve un error
+//         if (result.rows.length > 0) {
+//             res.status(200).json(result.rows);
+//         } else {
+//             res.status(500).json({ error: 'Matricula y/o quiz no válidos o no se pudo crear un intento.' });
+//         }
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'Se produjo un error en el servidor.' });
-    } finally {
-        // Siempre libera la conexión al cliente, incluso si hubo un error
-        client.release();
-    }
-});
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send({ error: 'Se produjo un error en el servidor.' });
+//     } finally {
+//         // Siempre libera la conexión al cliente, incluso si hubo un error
+//         client.release();
+//     }
+// });
 
 
 router.post('/submitRespuesta/', async (req, res) => {
