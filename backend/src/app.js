@@ -68,7 +68,7 @@ app.get('/', (req, res) => {
   const PORT = process.env.PORT
   console.log('A punto de iniciar el servidor en el puerto 3001 que en local es 9050 y la API se comunica a: ', PORT);
   app.listen(3001, '0.0.0.0', () => { // Change this in production [IMPORTANT]
-    console.log(`Servidor iniciado en el puerto 3000`);
+    console.log(`Servidor iniciado en el puerto 3001`);
   });
 
 module.exports = app;
