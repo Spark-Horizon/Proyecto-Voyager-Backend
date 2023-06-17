@@ -81,10 +81,11 @@ router.post('/submitRespuesta/', async (req, res) => {
     let client;
     const { id_respuesta, answer_JSON } = req.body;
     console.log(id_respuesta, answer_JSON);
+    const respuesta = JSON.parse(`{"respuesta":"${answer_JSON.respuesta}"}`);
     try{
         client = await pool.connect();
         await Promise.all([
-            client.query(CALL_actualizarRespuesta,[id_respuesta,answer_JSON]),
+            client.query(CALL_actualizarRespuesta,[id_respuesta,respuesta]),
             client.query(CALL_actualizarRespuestaCorrecta,[id_respuesta,answer_JSON.correcto])
         ])
         res.status(200).json({ success: true });
