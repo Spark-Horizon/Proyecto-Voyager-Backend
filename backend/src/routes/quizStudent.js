@@ -29,6 +29,8 @@ const CALL_actualizarRespuesta = `CALL actualizarRespuesta($1, $2);`;
 
 const CALL_actualizarRespuestaCorrecta = `CALL actualizarRespuestaCorrecta($1, $2);`;
 
+//END QUERYS
+
 router.get('/getorset/:matricula/:quiz', async (req, res) => {
     const estudiante_ID = req.params.matricula;
     const quizz_ID = req.params.quiz;
@@ -77,7 +79,23 @@ router.get('/getorset/:matricula/:quiz', async (req, res) => {
 
 router.post('/submitRespuesta/', async (req, res) => {
     let client;
-    
+    const { id_respuesta, answer_JSON } = req.body;
+    console.log(id_respuesta, answer_JSON);
+    try{
+        client = await pool.connect();
+        await Promise.all([
+            client.query(CALL_actualizarRespuesta,[id_respuesta,answer_JSON]),
+            client.query(CALL_actualizarRespuestaCorrecta,[id_respuesta,answer_JSON.correcto])
+        ])
+        res.status(200).json({ success: true });
+    }catch (error){
+        console.error(error);
+        res.status(500).json({ error: 'Se produjo un error al enviar la respuesta en el servidor'});
+    }finally{
+        if(client){
+            client.release();
+        }
+    }
 });
 
 router.post('/submitIntento/', async (req, res) => {
