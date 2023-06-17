@@ -9,7 +9,7 @@ const GET_ID_ANSWER_AND_FILE = `SELECT respuestas.id AS id_respuesta, tipo, ejer
 FROM respuestas
 JOIN intentos ON respuestas.id_intento = intentos.id
 JOIN ejercicios ON respuestas.id_ejercicio = ejercicios.id
-WHERE intentos.id = $1;
+WHERE intentos.id = $1 AND respuestas.respuesta IS NULL;
 `;
 
 const GET_ID_ATTEMPT_QUERY = `SELECT id
