@@ -25,6 +25,10 @@ const ADD_AND_CONSULT_NEW_ATTEMPT = `SELECT
 agregarObtenerIntento($1, $2);
 `;
 
+const CALL_actualizarRespuesta = `CALL actualizarRespuesta($1, $2);`;
+
+const CALL_actualizarRespuestaCorrecta = `CALL actualizarRespuestaCorrecta($1, $2);`;
+
 router.get('/getorset/:matricula/:quiz', async (req, res) => {
     const estudiante_ID = req.params.matricula;
     const quizz_ID = req.params.quiz;
@@ -73,30 +77,7 @@ router.get('/getorset/:matricula/:quiz', async (req, res) => {
 
 router.post('/submitRespuesta/', async (req, res) => {
     let client;
-    try {
-        const { id_respuesta, answer } = req.body;
-        const answerJSON = JSON.parse(answer);
-        const correct = answerJSON.correcto;
-
-        client = await pool.connect();
-        const query1 = `CALL actualizarRespuesta($1, $2);`;
-        const query2 = `CALL actualizarRespuestaCorrecta($1, $2);`;
-
-        await Promise.all([
-            client.query(query1, [id_respuesta, answer]),
-            client.query(query2, [id_respuesta, correct])
-        ]);
-
-        res.status(200).json({ success: true });
-        client.release();
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Error interno del servidor" });
-    }finally{
-        if(client){
-            client.release();
-        }
-    }
+    
 });
 
 router.post('/submitIntento/', async (req, res) => {
