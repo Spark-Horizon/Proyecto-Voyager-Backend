@@ -55,7 +55,7 @@ router.get('/getorset/:matricula/:quiz', async (req, res) => {
         }
 
         const resultGet = await client.query(GET_ID_ANSWER_AND_FILE, [intentoId]);
-        console.log('ResultGet: ', resultGet.rows)
+        // console.log('ResultGet: ', resultGet.rows)
 
         if (intentoId) {
             res.status(200).json({
@@ -80,7 +80,7 @@ router.get('/getorset/:matricula/:quiz', async (req, res) => {
 router.post('/submitRespuesta/', async (req, res) => {
     let client;
     const { id_respuesta, answer_JSON } = req.body;
-    console.log(id_respuesta, answer_JSON);
+    console.log('Este es el id de la respuesta a enviar: ',id_respuesta,' y esta es la respuesta que se manda: ', answer_JSON);
     const respuesta = {"respuesta": answer_JSON.respuesta};
     try{
         client = await pool.connect();
@@ -103,7 +103,7 @@ router.post('/submitIntento/', async (req, res) => {
     let client;
     try {
         const { id_intento } = req.body;
-        console.log(id_intento)
+        console.log('Este es el id del intento enviado: ',id_intento)
 
         client = await pool.connect();
         const query = `CALL entregarIntento($1);`;
